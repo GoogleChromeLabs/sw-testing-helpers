@@ -4,8 +4,9 @@
   "description": "A set of helper files used to test Propel and sw-toolbox.",
   "main": "./src/node-helpers/index.js",
   "scripts": {
-    "test": "gulp && mocha",
-    "browser-tests": "nodemon test/server/index.js"
+    "build": "gulp",
+    "build-docs": "jsdoc -c ./jsdoc.conf",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -35,11 +36,12 @@
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",
+    "gulp-mocha": "^2.2.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.3",
     "pullr": "^0.3.2",
     "require-dir": "^0.3.0",
-    "rollupify": "^0.1.0",
+    "rollupify": "^0.2.0",
     "run-sequence": "^1.1.5",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"

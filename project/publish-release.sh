@@ -1,20 +1,22 @@
 #!/bin/bash
-
-# Copyright 2016 Google Inc. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License
-
 set -e
+
+#########################################################################
+#
+# GUIDE TO USE OF THIS SCRIPT
+#
+#########################################################################
+#
+# - Set up npm scripts to perform the following acctions:
+#     - npm run build
+#     - npm run build-docs
+#     - npm run test
+#
+# - Alter the GITHUB_REPO to the appropriate URL
+#
+#########################################################################
+
+GITHUB_REPO="https://github.com/GoogleChrome/sw-testing-helpers.git"
 
 # NOTES:
 #     To delete a tag use: git push origin :v1.0.0
@@ -24,8 +26,30 @@ if [[ $1 != "patch" && $1 != "minor" && $1 != "major" ]] ; then
   exit 1;
 fi
 
+# Get the current branch from git. Outputs something similar to: refs/heads/master
+currentBranch="$(git symbolic-ref HEAD)"
+# Helpful info on string manipulation: http://tldp.org/LDP/abs/html/string-manipulation.html
+# Double hash deletes the substring after the double hash.
+currentBranch=${currentBranch##refs/heads/}
+
+if [[ $currentBranch != "master" ]]; then
+  echo "    This script must be run from the master branch.";
+  exit 1;
+fi
+
 echo ""
-echo "Build and Test"
+echo "Building Library"
+echo ""
+npm run build
+
+echo ""
+echo ""
+echo "Building Docs"
+echo ""
+npm run build-docs
+
+echo ""
+echo "Perform Tests"
 echo ""
 npm run test
 
@@ -64,9 +88,9 @@ rm -rf ./tagged-release
 mkdir tagged-release
 
 # Copy over files that we want in the release
-cp -r ./build ./tagged-release
+cp -r ./docs ./tagged-release
 cp -r ./src ./tagged-release
-cp -r ./test ./tagged-release
+cp -r ./build ./tagged-release
 cp LICENSE ./tagged-release
 cp package.json ./tagged-release
 cp README.md ./tagged-release
@@ -77,9 +101,8 @@ echo ""
 echo ""
 echo "Git push to release branch"
 echo ""
-GIT_REPO="https://github.com/GoogleChrome/sw-testing-helpers.git"
 git init
-git remote add origin $GIT_REPO
+git remote add origin $GITHUB_REPO
 git checkout -b release
 git add .
 git commit -m "New tagged release - $PACKAGE_VERSION"
@@ -106,6 +129,21 @@ echo ""
 
 git add package.json
 git commit -m "Auto-generated PR to update package.json with new version - $PACKAGE_VERSION"
-git push -f origin release-pr
+git push origin -f $currentBranch:release-pr
 
-./node_modules/pullr/bin/pullr.js --new --from release-pr --into master --title 'Auto-generated PR to update the version number' --description 'Please review this change and ensure that package.json is the ONLY file changed AND that the version matches the latest tagged release.'
+# Make sure any pending commits on master are reset (i.e. the package.json commit)
+git reset --hard origin/$currentBranch
+
+{
+  ./node_modules/pullr/bin/pullr.js --new --from release-pr --into master --title 'Auto-generated PR to update the version number' --description 'Please review this change and ensure that package.json is the ONLY file changed AND that the version matches the latest tagged release.'
+} || {
+  echo ""
+  echo "ERROR: Unable to auto-generate the Pull Request from release-pr into master. Please do so manually."
+  echo ""
+}
+
+echo ""
+echo ""
+echo "Build and Publish Docs"
+echo ""
+./project/publish-docs.sh releases/$PACKAGE_VERSION

@@ -34,77 +34,26 @@
   <script src="/node_modules/mocha/mocha.js"></script>
 
   <!-- SW Helper -->
-  <script src="/build/in-browser-helpers/sw-helper.js"></script>
+  <script src="/build/browser/window-utils.js"></script>
+  <script src="/src/mocha/utils.js"></script>
 
   <script>mocha.setup({
     ui: 'bdd'
   })</script>
 
   <!-- Add test scripts here -->
+  <script src="/test/browser-tests/examples.js"></script>
 
   <script>
     (function() {
-      // To automate the tests with selenium, we need a way
-      // to inform selenium when the tests are completed and
-      // pass results back.
-      // This is done by waiting for window.testsuite to be defined.
-      // This is done in publishTestResults();
-      var passedTests = [];
-      var failedTests = [];
-
-      // This is a helper method that simplifies the test
-      // results to an object that can be JSON.string-ified.
-      function getFriendlyTestResult(testResult) {
-        return {
-          title: testResult.title,
-          state: testResult.state
-        };
-      };
-
-      // Once this is called, automated tests should be
-      // able to read window.testsuite and get test results.
-      function publishTestResults() {
-        window.testsuite = {
-          testResults: {
-            passed: passedTests,
-            failed: failedTests
-          }
-        };
-      }
-
       // should adds objects to primitives which requires this call to be made
       // before any tests are run.
       window.chai.should();
 
-      // We unregister all service workers, clear all caches and remove
-      // All registered iframes
-      beforeEach(function() {
-
+      window.goog.MochaUtils.startMochaTest()
+      .then(results => {
+        window.testsuite = results;
       });
-
-      // Clean up after the final test has finished
-      after(function() {
-
-      });
-
-      mocha.checkLeaks();
-      var runResults = mocha.run();
-      // pass, fail and end events allow up to capture results and
-      // determine when to publish test results
-      runResults.on('pass', function(test) {
-        passedTests.push(getFriendlyTestResult(test));
-      })
-      .on('fail', function(test) {
-        failedTests.push(getFriendlyTestResult(test));
-      })
-      .on('end', function() {
-        publishTestResults();
-      });
-
-      // No tests so end won't be called
-      if (window.mocha.suite.tests.length === 0) {
-        publishTestResults();
-      }
     })();
   </script>
 </body>

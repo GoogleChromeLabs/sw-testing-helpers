@@ -41,4 +41,6 @@ before_script:
   - "sh -e /etc/init.d/xvfb start"
 
 script:
-  - npm test
+  - npm run build
+  - npm run test
+  - sh ./project/publish-docs.sh master

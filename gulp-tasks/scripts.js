@@ -59,7 +59,7 @@ const bundleJS = function(fullFilePath) {
 
 const build = function() {
   const globResponse = glob.sync(GLOBAL.config.src +
-    '/in-browser-helpers/**/*.js', {
+    '/browser/**/*.js', {
       dot: false
     });
 
