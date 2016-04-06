@@ -1,6 +1,3 @@
 {
-  "extends": "google",
-  "rules": {
-    "require-jsdoc": 0
-  }
+  "extends": "google"
 }

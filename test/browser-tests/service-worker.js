@@ -43,17 +43,3 @@ describe('Example SW Tests', function() {
     throw new Error('I`m an Error. Hi.');
   });
 });
-
-self.addEventListener('message', event => {
-  switch (event.data) {
-    case 'start-tests':
-      self.goog.SWUtils.runMochaTests()
-      .then(results => {
-        event.ports[0].postMessage(results);
-      });
-      break;
-    default:
-      event.ports[0].postMessage(new Error('Unknown test name: ' + event.data));
-      break;
-  }
-});

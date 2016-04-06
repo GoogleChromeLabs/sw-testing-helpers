@@ -30,7 +30,7 @@ app.get('/', function(req, res) {
 
 let _server;
 
-function startServer(path, portNumber) {
+function startServer(path, portNumber, host) {
   if (_server) {
     _server.close();
   }
@@ -38,6 +38,10 @@ function startServer(path, portNumber) {
   // 0 will pick a random port number
   if (typeof portNumber === 'undefined') {
     portNumber = 0;
+  }
+
+  if (typeof host === 'undefined') {
+    host = 'localhost';
   }
 
   // Allow all assets in the project to be served, including any
@@ -53,7 +57,7 @@ function startServer(path, portNumber) {
 
   return new Promise(resolve => {
     // Start service on desired port
-    _server = app.listen(portNumber, function() {
+    _server = app.listen(portNumber, host, function() {
       resolve(_server.address().port);
     });
   });

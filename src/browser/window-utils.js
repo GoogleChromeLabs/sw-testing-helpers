@@ -17,52 +17,86 @@
 
 /* eslint-env browser */
 
-// The test counter ensures a unique scope between each test.
-// testTime is used to ensure a unique scope between runs of
-// the test suite - useful if manual testing parts of the
-// suite in different tabs at the same time.
-var testCounter = 0;
-var testTime = new Date().getTime();
+/**
+ * <p>WindowUtils can be used in a *webpage only* i.e. must have access to a
+ * window object.</p>
+ *
+ * <p>Accessible via: window.goog.WindowUtils</p>
+ *
+ * <p>The main uses for these utils are:</p>
+ * <ul>
+ * <li>Managing service workers by loading pages in an iframe to reduce scope</li>
+ * <li>Helpers to unregister service workers and remove caches</li>
+ * <li>Run mocha tests in a service worker. If you use this, it's expected you'll
+ * also make use of the SWUtils inside the service worker.</li>
+ * </ul>
+ */
+class WindowUtils {
+  constructor() {
+    // The test counter ensures a unique scope between each test.
+    // testTime is used to ensure a unique scope between runs of
+    // the test suite - useful if manual testing parts of the
+    // suite in different tabs at the same time.
+    this._testCounter = 0;
+    this._testTime = new Date().getTime();
+    this._messageListeners = [];
+  }
 
-function onStateChangePromise(registration, desiredState) {
-  return new Promise((resolve, reject) => {
-    if (registration.installing === null) {
-      throw new Error('Service worker is not installing.');
-    }
-
-    var serviceWorker = registration.installing;
-
-    // We unregister all service workers after each test - this should
-    // always trigger an install state change
-    var stateChangeListener = function() {
-      if (this.state === desiredState) {
-        serviceWorker.removeEventListener('statechange', stateChangeListener);
-        resolve();
-        return;
+  /**
+   * Helper method to determine when a specific state is achieved within
+   * a service worker (i.e. it becomes installed or activated).
+   *
+   * @private
+   *
+   * @param  {ServiceWorkerRegistration} registration registration to watch
+   *   for state changes
+   * @param  {String} desiredState Name of the desired state to wait for
+   * @return {Promise}        Resolves when the desired state is reached
+   */
+  _onStateChangePromise(registration, desiredState) {
+    return new Promise((resolve, reject) => {
+      if (registration.installing === null) {
+        throw new Error('Service worker is not installing.');
       }
 
-      if (this.state === 'redundant') {
-        serviceWorker.removeEventListener('statechange', stateChangeListener);
+      var serviceWorker = registration.installing;
 
-        // Must call reject rather than throw error here due to this
-        // being inside the scope of the callback function stateChangeListener
-        reject(new Error('Installing servier worker became redundant'));
-        return;
-      }
-    };
+      // We unregister all service workers after each test - this should
+      // always trigger an install state change
+      var stateChangeListener = function() {
+        if (this.state === desiredState) {
+          serviceWorker.removeEventListener('statechange', stateChangeListener);
+          resolve();
+          return;
+        }
 
-    serviceWorker.addEventListener('statechange', stateChangeListener);
-  });
-}
+        if (this.state === 'redundant') {
+          serviceWorker.removeEventListener('statechange', stateChangeListener);
 
-window.goog = window.goog || {};
-window.goog.WindowUtils = window.goog.WindowUtils || {
-  // Each service worker that is registered should be given a unique
-  // scope. To achieve this we register it with a scope the same as
-  // an iframe's src that is unique for each test.
-  // Service workers will then be made to claim pages on this scope -
-  // i.e. the iframe
-  getIframe: function() {
+          // Must call reject rather than throw error here due to this
+          // being inside the scope of the callback function stateChangeListener
+          reject(new Error('Installing servier worker became redundant'));
+          return;
+        }
+      };
+
+      serviceWorker.addEventListener('statechange', stateChangeListener);
+    });
+  }
+
+  /**
+   * <p>When a service worker is installed / activated using WindowUtils
+   * it'lls be registered with a unqiue scope and an iframe will be
+   * created matching that scope (allowing it to be controlled by that
+   * service worker only).</p>
+   *
+   * <p>This method will get you the current iframe (if in the middle of a test)
+   * or create a new iframe.</p>
+   *
+   * @return {Promise.<HTMLElement>} Resolves to the current iframe being
+   * used for tests.
+   */
+  getIframe() {
     return new Promise(resolve => {
       var existingIframe = document.querySelector('.js-test-iframe');
       if (existingIframe) {
@@ -70,39 +104,57 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
       }
 
       // This will be used as a unique service worker scope
-      testCounter++;
+      this._testCounter++;
 
       var newIframe = document.createElement('iframe');
       newIframe.classList.add('js-test-iframe');
-      newIframe.src = `/test/iframe/${testTime}${testCounter}`;
+      newIframe.src = `/test/iframe/${this._testTime}${this._testCounter}`;
       newIframe.addEventListener('load', () => {
         resolve(newIframe);
       });
       document.body.appendChild(newIframe);
     });
-  },
+  }
 
-  unregisterAllRegistrations: function() {
+  /**
+   * Loop through all registrations for the current origin and unregister them.
+   * @return {Promise} Resolves once all promises are unregistered
+   */
+  unregisterAllRegistrations() {
     return navigator.serviceWorker.getRegistrations()
       .then(registrations => {
         return Promise.all(registrations.map(registration => {
           return registration.unregister();
         }));
       });
-  },
+  }
 
-  clearAllCaches: function() {
+  /**
+   * Loop over all caches for the current origin and delete them
+   * @return {Promise} Resolves once all caches are deleted
+   */
+  clearAllCaches() {
     return window.caches.keys()
       .then(cacheNames => {
         return Promise.all(cacheNames.map(cacheName => {
           return window.caches.delete(cacheName);
         }));
       });
-  },
+  }
 
-  // Waiting for a service worker to install is handy if you only care
-  // about testing events that have occured in the install event
-  installSW: function(swUrl) {
+  /**
+   * <p>This method registers a service worker to a unique scope and
+   * creates an iframe it can control and waits until the service workers
+   * install step has completed.</p>
+   *
+   * <p>This is useful for scenarios where you only care
+   * about testing events that have occured in the install event (i.e.
+   * pre-caching assets).</p>
+   * @param  {String} swUrl The url to a service worker file to register
+   * @return {Promise.<HTMLElement>}       Resolves once the service worker is
+   * installed and returns the iframe it controls.
+   */
+  installSW(swUrl) {
     return new Promise((resolve, reject) => {
       var iframe;
       this.getIframe()
@@ -115,15 +167,26 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
 
         return navigator.serviceWorker.register(swUrl, options);
       })
-      .then(registration => onStateChangePromise(registration, 'installed'))
+      .then(registration => {
+        return this._onStateChangePromise(registration, 'installed');
+      })
       .then(() => resolve(iframe))
       .catch(err => reject(err));
     });
-  },
+  }
 
-  // To test fetch event behaviour in a service worker you will need to wait
-  // for the service worker to activate
-  activateSW: function(swUrl) {
+  /**
+   * <p>Similar to installSW. This method registers a service worker to a unique scope and
+   * creates an iframe it can control and waits until the service workers
+   * activate step has completed.</p>
+   *
+   * <p>Useful when you want to test fetch events that can't happen until the
+   * service worker has activated.</p>
+   * @param  {String} swUrl The url to a service worker file to register
+   * @return {Promise.<HTMLElement>}       Resolves once the service worker is
+   * activated and returns the iframe it controls.
+   */
+  activateSW(swUrl) {
     return new Promise((resolve, reject) => {
       var iframe;
       this.getIframe()
@@ -135,16 +198,24 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
         }
         return navigator.serviceWorker.register(swUrl, options);
       })
-      .then(registration => onStateChangePromise(registration, 'activated'))
+      .then(registration => {
+        return this._onStateChangePromise(registration, 'activated');
+      })
       .then(() => resolve(iframe))
       .catch(err => reject(err));
     });
-  },
+  }
 
-  // This is a helper method that checks the cache exists before
-  // getting all the cached responses.
-  // This is limited to text at the moment.
-  getAllCachedAssets: function(cacheName) {
+  /**
+   * <p>Helper method that checks a cache with a specific name exists before
+   * retrieving all the cached responses inside of it.</p>
+   * <p>This is limited to text at the moment.</p>
+   * @param  {String} cacheName The name of the cache to get the contents from.
+   * @return {Promise.<Object>}           Resolves to an object where the keys
+   * are URLs for the cache responses and the value is the text from the response.
+   * The promise rejects if the cache doesn't exist.
+   */
+  getAllCachedAssets(cacheName) {
     var cache = null;
     return window.caches.has(cacheName)
       .then(hasCache => {
@@ -172,11 +243,14 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
         });
         return output;
       });
-  },
+  }
 
-  // Helper to unregister all service workers and clean all caches
-  // This should be called before each test
-  cleanState: function() {
+  /**
+   * Helper to unregister all service workers and clean all caches.
+   * @return {Promise} Resolves once service workers are unregistered and caches
+   * are deleted.
+   */
+  cleanState() {
     return Promise.all([
       this.unregisterAllRegistrations(),
       this.clearAllCaches()
@@ -192,11 +266,14 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
         navigator.serviceWorker.removeEventListener('message', listener);
       });
     });
-  },
+  }
 
-  messageListeners: [],
-
-  addMessageListener: function(cb) {
+  /**
+   * Helper to track added message listeners on a service worker and delete
+   * them whne cleanState is called
+   * @param {Function} cb The function to call when a message is received
+   */
+  addMessageListener(cb) {
     var messageListener = function(event) {
       cb(JSON.parse(event.data));
     };
@@ -204,8 +281,32 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
     this.messageListeners.push(messageListener);
 
     navigator.serviceWorker.addEventListener('message', messageListener);
-  },
+  }
 
+  /**
+   * The complete Triforce, or one or more components of the Triforce.
+   * @typedef {Object} TestResult
+   * @property {String} parentTitle - Title of the parent test suite
+   * @property {String} state - Will be 'passed' or 'failed'
+   * @property {String} title - Title of the test
+   * @property {String} errMessage - Optional parameter if the test has failed
+   */
+
+  /**
+   * The complete Triforce, or one or more components of the Triforce.
+   * @typedef {Object} TestResults
+   * @property {Array.<TestResult>} passed - Array of passed tests
+   * @property {Array.<TestResult>} failed - Array of failed tests
+   */
+
+  /**
+   * Method to send a message to a service worker to begin mocha tests.
+   * It's expected that the service worker will import sw-utils in the service
+   * worker to make this work seamlessly.
+   * @param  {String} swPath The path to a service worker
+   * @return {Promise.<TestResults>}        Promise resolves when the tests
+   * in the service worker have completed.
+   */
   runMochaTests(swPath) {
     const sendMessage = (swController, testName) => {
       return new Promise(function(resolve, reject) {
@@ -242,4 +343,7 @@ window.goog.WindowUtils = window.goog.WindowUtils || {
       });
     });
   }
-};
+}
+
+window.goog = window.goog || {};
+window.goog.WindowUtils = window.goog.WindowUtils || new WindowUtils();

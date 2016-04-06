@@ -16,7 +16,3 @@ You can view the default automated tests with the following npm scripts.
 Run the automated tests:
 
     npm run test
-
-Run the browser tests yourself:
-
-    npm run browser-tests
