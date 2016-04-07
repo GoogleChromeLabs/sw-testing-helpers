@@ -8,6 +8,6 @@
 
   <!-- The docs server over HTTPS, but site.github.url points to HTTP resouce causing mixed content -->
   <link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.github.url | replace: 'http://', '//' }}">
-  <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.github.url | replace: 'http://', '//' }}">
-  <link rel="alternate" type="application/rss+xml" title="{{ site.github.project_title }}" href="{{ "/feed.xml" | prepend: site.github.url | replace: 'http://', '//' }}">
+  <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.github.url | replace: 'http://', 'https://' }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.github.project_title }}" href="{{ "/feed.xml" | prepend: site.github.url | replace: 'http://', 'https://' }}">
 </head>
