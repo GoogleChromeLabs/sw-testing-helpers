@@ -3,7 +3,7 @@
   <div class="wrapper">
 
     <div class="site-title">
-      <p><a href="{{ site.github.url | replace: 'http://', '//' }}">{{ site.github.project_title }}</a></p>
+      <p><a href="{{ site.github.url | replace: 'http://', 'https://' }}">{{ site.github.project_title }}</a></p>
       <p>{{ site.github.project_tagline }}</p>
     </div>
 
@@ -19,7 +19,7 @@
       <div class="trigger">
         {% for my_page in site.pages %}
           {% if my_page.title %}
-          <a class="page-link" href="{{ my_page.url | prepend: site.github.url | replace: 'http://', '//' }}">{{ my_page.title }}</a>
+          <a class="page-link" href="{{ my_page.url | prepend: site.github.url | replace: 'http://', 'https://' }}">{{ my_page.title }}</a>
           {% endif %}
         {% endfor %}
       </div>
