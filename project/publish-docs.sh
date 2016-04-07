@@ -87,7 +87,7 @@ echo ""
   if [ "$TRAVIS" ]; then
     # inside this git repo we'll pretend to be a new user
     git config user.name "Travis CI"
-    git config user.email "propel@google.com"
+    git config user.email "gauntface@google.com"
   fi
 
   git add ./$docLocation

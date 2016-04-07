@@ -77,7 +77,7 @@ PACKAGE_VERSION=$(npm --no-git-tag-version version $1)
 
 echo ""
 echo ""
-echo "Are you sure you want to publish a new version of Propel [$PACKAGE_VERSION] y/N?"
+echo "Are you sure you want to publish a version [$PACKAGE_VERSION] y/N?"
 echo ""
 read answer
 if [[ $answer != "y" && $answer != "Y" ]]; then
