@@ -17,8 +17,7 @@
 
 importScripts('/node_modules/mocha/mocha.js');
 importScripts('/node_modules/chai/chai.js');
-importScripts('/src/browser/sw-utils.js');
-importScripts('/src/mocha/utils.js');
+importScripts('/build/browser/sw-utils.js');
 
 self.chai.should();
 mocha.setup({
@@ -29,17 +28,18 @@ mocha.setup({
 mocha.checkLeaks();
 mocha.globals(['goog']);
 
-
 describe('Example SW Tests', function() {
   it('should do nothing', function() {
-
+    console.log('TEST 1');
   });
 
   it('should be able to identify a Date as a Date', function() {
+    console.log('TEST 2');
     (new Date() instanceof Date).should.equal(true);
   });
 
   it('should throw an error', function() {
+    console.log('TEST 3');
     throw new Error('I`m an Error. Hi.');
   });
 });

@@ -39,7 +39,6 @@ class WindowUtils {
     // suite in different tabs at the same time.
     this._testCounter = 0;
     this._testTime = new Date().getTime();
-    this._messageListeners = [];
   }
 
   /**
@@ -56,7 +55,8 @@ class WindowUtils {
   _onStateChangePromise(registration, desiredState) {
     return new Promise((resolve, reject) => {
       if (registration.installing === null) {
-        throw new Error('Service worker is not installing.');
+        throw new Error('Service worker is not installing. Did you call ' +
+          'cleanState() to unregister this service?');
       }
 
       var serviceWorker = registration.installing;
@@ -108,10 +108,10 @@ class WindowUtils {
 
       var newIframe = document.createElement('iframe');
       newIframe.classList.add('js-test-iframe');
-      newIframe.src = `/test/iframe/${this._testTime}${this._testCounter}`;
       newIframe.addEventListener('load', () => {
         resolve(newIframe);
       });
+      newIframe.src = `/test/iframe/${this._testTime}${this._testCounter}`;
       document.body.appendChild(newIframe);
     });
   }
@@ -161,8 +161,8 @@ class WindowUtils {
       .then(newIframe => {
         var options = null;
         if (newIframe) {
-          options = {scope: iframe.contentWindow.location.pathname};
           iframe = newIframe;
+          options = {scope: newIframe.contentWindow.location.pathname};
         }
 
         return navigator.serviceWorker.register(swUrl, options);
@@ -229,18 +229,26 @@ class WindowUtils {
         cache = openedCache;
         return cache.keys();
       })
-      .then(cacheKeys => {
-        return Promise.all(cacheKeys.map(cacheKey => {
-          return cache.match(cacheKey);
+      .then(cachedRequests => {
+        return Promise.all(cachedRequests.map(cachedRequest => {
+          return cache.match(cachedRequest)
+          .then(response => {
+            return {
+              request: cachedRequest,
+              response: response
+            };
+          });
         }));
       })
-      .then(cacheResponses => {
+      .then(cacheRequestResponsePairs => {
         // This method extracts the response streams and pairs
         // them with a url.
         var output = {};
-        cacheResponses.forEach(response => {
-          output[response.url] = response;
+        cacheRequestResponsePairs.forEach(cacheRequestResponsePair => {
+          output[cacheRequestResponsePair.request.url] =
+            cacheRequestResponsePair.response;
         });
+
         return output;
       });
   }
@@ -260,31 +268,12 @@ class WindowUtils {
       for (var i = 0; i < iframeList.length; i++) {
         iframeList[i].parentElement.removeChild(iframeList[i]);
       }
-    })
-    .then(() => {
-      this.messageListeners.forEach(function(listener) {
-        navigator.serviceWorker.removeEventListener('message', listener);
-      });
     });
   }
 
   /**
-   * Helper to track added message listeners on a service worker and delete
-   * them whne cleanState is called
-   * @param {Function} cb The function to call when a message is received
-   */
-  addMessageListener(cb) {
-    var messageListener = function(event) {
-      cb(JSON.parse(event.data));
-    };
-
-    this.messageListeners.push(messageListener);
-
-    navigator.serviceWorker.addEventListener('message', messageListener);
-  }
-
-  /**
-   * The complete Triforce, or one or more components of the Triforce.
+   * A TestResult object will contain the following information about the
+   * test it represents.
    * @typedef {Object} TestResult
    * @property {String} parentTitle - Title of the parent test suite
    * @property {String} state - Will be 'passed' or 'failed'
@@ -293,7 +282,8 @@ class WindowUtils {
    */
 
   /**
-   * The complete Triforce, or one or more components of the Triforce.
+   * TestResults is a simple javascript object containing all results
+   * from the mocha test runner
    * @typedef {Object} TestResults
    * @property {Array.<TestResult>} passed - Array of passed tests
    * @property {Array.<TestResult>} failed - Array of failed tests
@@ -307,20 +297,20 @@ class WindowUtils {
    * @return {Promise.<TestResults>}        Promise resolves when the tests
    * in the service worker have completed.
    */
-  runMochaTests(swPath) {
-    const sendMessage = (swController, testName) => {
+  runSWMochaTests(swPath) {
+    const sendMessage = (swController, testName, timeout) => {
       return new Promise(function(resolve, reject) {
         var messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function(event) {
-          if (event.data.error) {
-            reject(event.data.error);
-          } else {
-            resolve(event.data);
-          }
+          resolve(event.data);
         };
 
         swController.postMessage(testName,
           [messageChannel.port2]);
+
+        if (timeout) {
+          setTimeout(() => reject(new Error('Message Timeout')), timeout);
+        }
       });
     };
 
@@ -329,6 +319,20 @@ class WindowUtils {
       return iframe.contentWindow.navigator.serviceWorker.ready
       .then(registration => {
         return registration.active;
+      })
+      .then(sw => {
+        return sendMessage(sw, 'ready-check', 400)
+        .then(msgResponse => {
+          if (!msgResponse.ready) {
+            return Promise.reject();
+          }
+
+          return sw;
+        })
+        .catch(() => {
+          throw new Error('Service worker failed to respond to the ready ' +
+            'check. Have you imported browser/sw-utils.js in the SW?');
+        });
       })
       .then(sw => {
         return sendMessage(sw, 'start-tests');

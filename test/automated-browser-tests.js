@@ -60,20 +60,14 @@ describe('Perform Browser Tests', function() {
         `${testServerURL}/test/browser-tests/`
       )
       .then(testResults => {
-        testResults.failed.length.should.equal(1);
-        testResults.failed[0].errMessage.should.equal('I`m an Error. Hi.');
-        testResults.failed[0].parentTitle.should.equal('Example Tests');
-        testResults.failed[0].state.should.equal('failed');
-        testResults.failed[0].title.should.equal('should throw an error');
+        if (testResults.failed.length > 0) {
+          const errorMessage = mochaHelper.prettyPrintErrors(
+            browserInfo.prettyName,
+            testResults
+          );
 
-        const errorMessage = mochaHelper.prettyPrintErrors(
-          browserInfo.prettyName,
-          testResults
-        );
-
-        (errorMessage.indexOf('I`m an Error. Hi.') !== -1).should.equal(true);
-        (errorMessage.indexOf('Example Tests') !== -1).should.equal(true);
-        (errorMessage.indexOf('should throw an error') !== -1).should.equal(true);
+          throw new Error(errorMessage);
+        }
       });
     });
   };

@@ -17,6 +17,8 @@
 
 /* eslint-env worker, serviceworker */
 
+const mochaUtils = require('../mocha/utils.js');
+
 self.goog = self.goog || {};
 self.goog.SWUtils = self.goog.SWUtils || {
   runMochaTests: function() {
@@ -39,10 +41,10 @@ self.goog.SWUtils = self.goog.SWUtils || {
       // pass, fail and end events allow up to capture results and
       // determine when to publish test results
       runResults.on('pass', function(test) {
-        passedTests.push(self.goog.MochaUtils.getFriendlyTestResult(test));
+        passedTests.push(mochaUtils.getFriendlyTestResult(test));
       })
       .on('fail', function(test) {
-        failedTests.push(self.goog.MochaUtils.getFriendlyTestResult(test));
+        failedTests.push(mochaUtils.getFriendlyTestResult(test));
       })
       .on('end', function() {
         resolve({
@@ -58,6 +60,11 @@ self.goog.SWUtils = self.goog.SWUtils || {
 
 self.addEventListener('message', event => {
   switch (event.data) {
+    case 'ready-check':
+      event.ports[0].postMessage({
+        ready: true
+      });
+      break;
     case 'start-tests':
       self.goog.SWUtils.runMochaTests()
       .then(results => {
@@ -65,7 +72,9 @@ self.addEventListener('message', event => {
       });
       break;
     default:
-      event.ports[0].postMessage(new Error('Unknown test name: ' + event.data));
+      event.ports[0].postMessage({
+        error: 'Unknown test name: ' + event.data
+      });
       break;
   }
 });
