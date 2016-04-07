@@ -5,3 +5,5 @@ firefox-*.tar.bz2
 firefox/
 build/
 docs/
+.sass-cache/
+_site/
