@@ -30,16 +30,14 @@ mocha.globals(['goog']);
 
 describe('Example SW Tests', function() {
   it('should do nothing', function() {
-    console.log('TEST 1');
+
   });
 
   it('should be able to identify a Date as a Date', function() {
-    console.log('TEST 2');
     (new Date() instanceof Date).should.equal(true);
   });
 
   it('should throw an error', function() {
-    console.log('TEST 3');
     throw new Error('I`m an Error. Hi.');
   });
 });
