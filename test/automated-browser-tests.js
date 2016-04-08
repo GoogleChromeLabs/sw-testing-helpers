@@ -24,16 +24,18 @@ const path = require('path');
 const mochaHelper = require('../src/mocha/utils.js');
 const SWTestingHelpers = require('../src/node/index.js');
 const automatedBrowserTesting = SWTestingHelpers.automatedBrowserTesting;
-const testServer = SWTestingHelpers.testServer;
+const TestServer = SWTestingHelpers.TestServer;
 
 describe('Perform Browser Tests', function() {
   // Browser tests can be slow
   this.timeout(60000);
 
   let globalDriverReference = null;
+  let testServer = null;
   let testServerURL;
 
   before(function() {
+    testServer = new TestServer();
     return testServer.startServer(path.join(__dirname, '..'))
     .then(portNumber => {
       testServerURL = `http://localhost:${portNumber}`;

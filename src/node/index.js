@@ -17,8 +17,9 @@
 'use strict';
 
 const AutomatedBrowserTesting = require('./automated-browser-testing.js');
+const TestServer = require('./server/test-server.js');
 
 module.exports = {
   automatedBrowserTesting: new AutomatedBrowserTesting(),
-  testServer: require('./server/server.js')
+  TestServer: TestServer
 };

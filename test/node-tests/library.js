@@ -37,6 +37,6 @@ describe('Test require of sw-testing-helpers', function() {
     const testingHelper = require(path.join('..', '..', packageJson.main));
 
     testingHelper.automatedBrowserTesting.should.be.defined;
-    testingHelper.testServer.should.be.defined;
+    testingHelper.TestServer.should.be.defined;
   });
 });
