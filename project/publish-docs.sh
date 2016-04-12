@@ -75,22 +75,33 @@ rm -rf ./gh-pages/$docLocation
 mkdir -p ./gh-pages/$docLocation
 cp -r ./docs/. ./gh-pages/$docLocation
 
+echo ""
+echo ""
+echo "Update Jekyll Template in gh-pages"
+echo ""
+cd ./gh-pages
+find . -maxdepth 1 ! -name 'docs' ! -name '.*' | xargs rm -rf
+cd ..
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+cp -r $SCRIPTPATH/../docs-template/. ./gh-pages/
 
 echo ""
 echo ""
 echo "Commit to gh-pages"
 echo ""
 # The curly braces act as a try / catch
-{
-  cd ./gh-pages
 
+cd ./gh-pages
+
+{
   if [ "$TRAVIS" ]; then
     # inside this git repo we'll pretend to be a new user
     git config user.name "Travis CI"
     git config user.email "gauntface@google.com"
   fi
 
-  git add ./$docLocation
+  git add ./
   git commit -m "Deploy to GitHub Pages"
 
   if [ "$TRAVIS" ]; then

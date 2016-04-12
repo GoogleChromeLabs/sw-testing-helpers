@@ -16,3 +16,10 @@ You can view the default automated tests with the following npm scripts.
 Run the automated tests:
 
     npm run test
+
+## Docs
+
+You can [find some docs here](http://googlechrome.github.io/sw-testing-helpers/)
+but they are far from complete.
+
+Any and all help welcome with this grab bag of stuff.
