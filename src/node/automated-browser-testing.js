@@ -57,7 +57,7 @@ class AutomatedBrowserTesting {
         getExecutableName: () => {
           switch (process.platform) {
             case 'darwin': {
-              const osXPath = '/Applications/Google\ Chrome\ Beta.app/' +
+              const osXPath = '/Applications/Google Chrome Beta.app/' +
                 'Contents/MacOS/Google Chrome Beta';
 
               // This will throw if it's not found
