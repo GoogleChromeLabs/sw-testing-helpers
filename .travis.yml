@@ -9,7 +9,11 @@ env:
 cache:
   directories:
     - node_modules
+os:
+  - linux
+  - osx
 node_js:
+  - '4'
   - 'stable'
 addons:
   # You can't install latest and beta as addons
@@ -31,7 +35,7 @@ install:
 # Read more here: https://docs.travis-ci.com/user/gui-and-headless-browsers/#Using-xvfb-to-Run-Tests-That-Require-a-GUI
 before_script:
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  - "sh -e /etc/init.d/xvfb start || echo \"Unable to start virtual display.\""
 
 script:
   - npm run build

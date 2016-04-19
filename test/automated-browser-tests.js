@@ -27,6 +27,11 @@ const automatedBrowserTesting = SWTestingHelpers.automatedBrowserTesting;
 const TestServer = SWTestingHelpers.TestServer;
 
 describe('Perform Browser Tests', function() {
+  if (process.env.TRAVIS && process.platform === 'darwin') {
+    console.warn('Skipping automated browser tests on Travis OS X.');
+    return;
+  }
+
   // Browser tests can be slow
   this.timeout(60000);
 
