@@ -24,6 +24,7 @@
     "del": "^2.2.0",
     "express": "^4.13.4",
     "mocha": "^2.4.5",
+    "pullr": "^0.3.2",
     "selenium-webdriver": "^2.52.0",
     "which": "^1.2.4"
   },

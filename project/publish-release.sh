@@ -137,8 +137,12 @@ git push origin -f $currentBranch:release-pr
 # Make sure any pending commits on master are reset (i.e. the package.json commit)
 git reset --hard origin/$currentBranch
 
+# This is the path of this script (i.e. if it's used within node_modules)
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+
 {
-  ./node_modules/pullr/bin/pullr.js --new --from release-pr --into master --title 'Auto-generated PR to update the version number' --description 'Please review this change and ensure that package.json is the ONLY file changed AND that the version matches the latest tagged release.'
+  $SCRIPTPATH/../node_modules/pullr/bin/pullr.js --new --from release-pr --into master --title 'Auto-generated PR to update the version number' --description 'Please review this change and ensure that package.json is the ONLY file changed AND that the version matches the latest tagged release.'
 } || {
   echo ""
   echo "ERROR: Unable to auto-generate the Pull Request from release-pr into master. Please do so manually."
@@ -149,4 +153,4 @@ echo ""
 echo ""
 echo "Build and Publish Docs"
 echo ""
-./project/publish-docs.sh releases/$PACKAGE_VERSION
+$SCRIPTPATH/publish-docs.sh releases/$PACKAGE_VERSION
