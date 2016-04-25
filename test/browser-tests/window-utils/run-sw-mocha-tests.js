@@ -22,53 +22,53 @@
 
 'use strict';
 
-describe('Test WindowUtils.runSWMochaTests()', function() {
+describe('Test MochaUtils.startServiceWorkerMochaTests()', function() {
 
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
   beforeEach(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   after(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   it('should reject with no arugments', function(done) {
-    return window.goog.WindowUtils.runSWMochaTests()
+    return window.goog.mochaUtils.startServiceWorkerMochaTests()
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with array arugment', function(done) {
-    return window.goog.WindowUtils.runSWMochaTests([])
+    return window.goog.mochaUtils.startServiceWorkerMochaTests([])
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with object arugment', function(done) {
-    return window.goog.WindowUtils.runSWMochaTests({})
+    return window.goog.mochaUtils.startServiceWorkerMochaTests({})
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with invalid sw path', function(done) {
-    return window.goog.WindowUtils.runSWMochaTests(SERVICE_WORKER_PATH + '/sw-doesnt-exist.js')
+    return window.goog.mochaUtils.startServiceWorkerMochaTests(SERVICE_WORKER_PATH + '/sw-doesnt-exist.js')
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with sw that has no message listener', function(done) {
-    return window.goog.WindowUtils.runSWMochaTests(SERVICE_WORKER_PATH + '/sw-1.js')
+    return window.goog.mochaUtils.startServiceWorkerMochaTests(SERVICE_WORKER_PATH + '/sw-1.js')
     .then(() => done(new Error('Should have rejected')))
     .catch(err => {
-      err.message.should.contain('sw-utils');
+      err.message.should.contain('mocha-utils');
       done();
     });
   });
 
   it('should resolve with sw that has no tests', function() {
-    return window.goog.WindowUtils.runSWMochaTests(SERVICE_WORKER_PATH + '/sw-no-tests.js')
+    return window.goog.mochaUtils.startServiceWorkerMochaTests(SERVICE_WORKER_PATH + '/sw-no-tests.js')
     .then(testResults => {
       testResults.passed.should.be.defined;
       testResults.failed.should.be.defined;
@@ -80,7 +80,7 @@ describe('Test WindowUtils.runSWMochaTests()', function() {
 
   it('should resolve with tests from example tests', function() {
     this.timeout(6000);
-    return window.goog.WindowUtils.runSWMochaTests(SERVICE_WORKER_PATH + '/example-tests.js')
+    return window.goog.mochaUtils.startServiceWorkerMochaTests(SERVICE_WORKER_PATH + '/example-tests.js')
     .then(testResults => {
       testResults.failed.length.should.equal(1);
       testResults.failed[0].errMessage.should.equal('I`m an Error. Hi.');
@@ -88,7 +88,7 @@ describe('Test WindowUtils.runSWMochaTests()', function() {
       testResults.failed[0].state.should.equal('failed');
       testResults.failed[0].title.should.equal('should throw an error');
 
-      const errorMessage = window.goog.MochaUtils.prettyPrintErrors(
+      const errorMessage = window.goog.mochaUtils.prettyPrintErrors(
         '/test/browser-tests/service-worker.js',
         testResults
       );

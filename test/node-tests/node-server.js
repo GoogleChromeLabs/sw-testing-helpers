@@ -23,7 +23,7 @@ const fetch = require('node-fetch');
 const expect = require('chai').expect;
 require('chai').should();
 
-const TestServer = require('../../src/node/index.js').TestServer;
+const TestServer = require('../../build/index.js').TestServer;
 
 describe('Perform Node TestServer', function() {
   let testServer;

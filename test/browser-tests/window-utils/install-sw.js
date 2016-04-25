@@ -22,50 +22,50 @@
 
 'use strict';
 
-describe('Test WindowUtils.installSW()', function() {
+describe('Test swUtils.installSW()', function() {
 
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
   beforeEach(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   after(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   it('should reject with no arugments', function(done) {
-    return window.goog.WindowUtils.installSW()
+    return window.goog.swUtils.installSW()
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with array arugment', function(done) {
-    return window.goog.WindowUtils.installSW([])
+    return window.goog.swUtils.installSW([])
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with object arugment', function(done) {
-    return window.goog.WindowUtils.installSW({})
+    return window.goog.swUtils.installSW({})
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with invalid sw path', function(done) {
-    return window.goog.WindowUtils.installSW(SERVICE_WORKER_PATH + '/sw-doesnt-exist.js')
+    return window.goog.swUtils.installSW(SERVICE_WORKER_PATH + '/sw-doesnt-exist.js')
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with sw that fails to install', function(done) {
-    return window.goog.WindowUtils.installSW(SERVICE_WORKER_PATH + '/sw-broken-install.js')
+    return window.goog.swUtils.installSW(SERVICE_WORKER_PATH + '/sw-broken-install.js')
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should resolve once the sw installs', function() {
-    return window.goog.WindowUtils.installSW(SERVICE_WORKER_PATH + '/sw-1.js')
+    return window.goog.swUtils.installSW(SERVICE_WORKER_PATH + '/sw-1.js')
     .then(iframe => {
       iframe.should.not.be.null;
     })

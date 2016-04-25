@@ -23,11 +23,11 @@ if [ -z "$1" ]; then
 fi
 
 # This isn't needed unless run outside of publish-release script
-mkdir -p tagged-release
+mkdir -p $1
 
 cp -r ./docs $1
 cp -r ./src $1
-cp -r ./build $1
+cp -r ./build/. $1
 cp -r ./project $1
 cp -r ./docs-template $1
 cp LICENSE $1

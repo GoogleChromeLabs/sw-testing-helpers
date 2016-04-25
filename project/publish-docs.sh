@@ -38,18 +38,6 @@ if [ -z "$1" ]; then
   exit 1;
 fi
 
-if [ "$TRAVIS" ]; then
-  if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    echo "In OS X on travis so skipping doc deployment."
-    exit 0;
-  fi
-
-  if [[ "$TRAVIS_BRANCH" != "master" || "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-    echo "In a travis build but not master branch so skipping doc deployment."
-    exit 0;
-  fi
-fi
-
 echo ""
 echo ""
 echo "Deploying new docs"

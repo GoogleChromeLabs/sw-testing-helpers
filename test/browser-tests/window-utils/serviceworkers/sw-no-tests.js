@@ -17,7 +17,7 @@
 
 importScripts('/node_modules/mocha/mocha.js');
 importScripts('/node_modules/chai/chai.js');
-importScripts('/build/browser/sw-utils.js');
+importScripts('/build/browser/mocha-utils.js');
 
 self.chai.should();
 mocha.setup({

@@ -40,4 +40,6 @@ before_script:
 script:
   - npm run build
   - npm run test
-  - ./project/publish-docs.sh master
+  - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+      ./project/publish-docs.sh master;
+    fi

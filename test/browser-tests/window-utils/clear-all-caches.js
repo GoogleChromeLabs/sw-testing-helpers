@@ -22,10 +22,10 @@
 
 'use strict';
 
-describe('Test WindowUtils.clearAllCaches()', function() {
+describe('Test swUtils.clearAllCaches()', function() {
 
   it('should resolve with nothing to clear', function() {
-    return window.goog.WindowUtils.clearAllCaches();
+    return window.goog.swUtils.clearAllCaches();
   });
 
   it('should resolve after deleting all caches', function() {
@@ -40,7 +40,7 @@ describe('Test WindowUtils.clearAllCaches()', function() {
       return cache.put('/', new Response('hello-2'));
     })
     .then(() => {
-      return window.goog.WindowUtils.clearAllCaches();
+      return window.goog.swUtils.clearAllCaches();
     })
     .then(() => {
       return window.caches.keys();

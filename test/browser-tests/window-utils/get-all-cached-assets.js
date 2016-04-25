@@ -22,36 +22,36 @@
 
 'use strict';
 
-describe('Test WindowUtils.getAllCachedAssets()', function() {
+describe('Test swUtils.getAllCachedAssets()', function() {
 
   beforeEach(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   after(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   it('should reject with no arugments', function(done) {
-    return window.goog.WindowUtils.getAllCachedAssets()
+    return window.goog.swUtils.getAllCachedAssets()
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with array arugment', function(done) {
-    return window.goog.WindowUtils.getAllCachedAssets([])
+    return window.goog.swUtils.getAllCachedAssets([])
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject with object arugment', function(done) {
-    return window.goog.WindowUtils.getAllCachedAssets({})
+    return window.goog.swUtils.getAllCachedAssets({})
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
 
   it('should reject when a non-existant cache name is given', function(done) {
-    return window.goog.WindowUtils.getAllCachedAssets('no-cache-here')
+    return window.goog.swUtils.getAllCachedAssets('no-cache-here')
     .then(() => done(new Error('Should have rejected')))
     .catch(() => done());
   });
@@ -71,7 +71,7 @@ describe('Test WindowUtils.getAllCachedAssets()', function() {
       ]);
     })
     .then(() => {
-      return window.goog.WindowUtils.getAllCachedAssets('hello');
+      return window.goog.swUtils.getAllCachedAssets('hello');
     })
     .then(assets => {
       const assetUrls = Object.keys(assets);
@@ -86,7 +86,7 @@ describe('Test WindowUtils.getAllCachedAssets()', function() {
       ]);
     })
     .then(() => {
-      return window.goog.WindowUtils.getAllCachedAssets('hello-2');
+      return window.goog.swUtils.getAllCachedAssets('hello-2');
     })
     .then(assets => {
       const assetUrls = Object.keys(assets);

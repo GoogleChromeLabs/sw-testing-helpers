@@ -22,25 +22,25 @@
 
 'use strict';
 
-describe('Test WindowUtils Library', function() {
-  it('should load window.goog.WindowUtils without leaks', function(done) {
+describe('Test swUtils Library', function() {
+  it('should load window.goog.swUtils without leaks', function(done) {
     // By leaks this is referring to the only thing Propel
     // should add to the global scope (i.e. window) is goog
     const scriptElement = document.createElement('script');
     scriptElement.setAttribute('type', 'text/javascript');
-    scriptElement.src = '/build/browser/window-utils.js';
+    scriptElement.src = '/build/browser/sw-utils.js';
     document.querySelector('head').appendChild(scriptElement);
     scriptElement.onerror = () => {
       done(new Error('Unable to load script.'));
     };
     scriptElement.onload = () => {
-      window.goog.WindowUtils.should.be.defined;
+      window.goog.swUtils.should.be.defined;
 
       done();
     };
   });
 
-  it('should be able to find window.goog.WindowUtils', () => {
-    window.goog.WindowUtils.should.be.defined;
+  it('should be able to find window.goog.swUtils', () => {
+    window.goog.swUtils.should.be.defined;
   });
 });

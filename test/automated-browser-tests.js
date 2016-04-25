@@ -21,9 +21,10 @@
 
 require('chai').should();
 const path = require('path');
-const mochaHelper = require('../src/mocha/utils.js');
-const SWTestingHelpers = require('../src/node/index.js');
+const mochaHelper = require('../build/utils/mocha.js');
+const SWTestingHelpers = require('../build/index.js');
 const automatedBrowserTesting = SWTestingHelpers.automatedBrowserTesting;
+const mochaUtils = SWTestingHelpers.mochaUtils;
 const TestServer = SWTestingHelpers.TestServer;
 
 describe('Perform Browser Tests', function() {
@@ -58,18 +59,18 @@ describe('Perform Browser Tests', function() {
   });
 
   const queueUnitTest = browserInfo => {
-    it(`should pass all tests in ${browserInfo.prettyName}`, () => {
+    it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
       globalDriverReference = browserInfo.getSeleniumDriver();
 
-      return automatedBrowserTesting.runMochaTests(
-        browserInfo.prettyName,
+      return mochaUtils.startWebDriverMochaTests(
+        browserInfo.getPrettyName(),
         globalDriverReference,
         `${testServerURL}/test/browser-tests/`
       )
       .then(testResults => {
         if (testResults.failed.length > 0) {
           const errorMessage = mochaHelper.prettyPrintErrors(
-            browserInfo.prettyName,
+            browserInfo.getPrettyName(),
             testResults
           );
 
@@ -79,9 +80,9 @@ describe('Perform Browser Tests', function() {
     });
   };
 
-  const automatedBrowsers = automatedBrowserTesting.getAutomatedBrowsers();
+  const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
-    if (browserInfo.releaseName === 'unstable') {
+    if (browserInfo.getReleaseName() === 'unstable') {
       return;
     }
 

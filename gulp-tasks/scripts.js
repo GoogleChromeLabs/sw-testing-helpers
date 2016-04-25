@@ -26,6 +26,7 @@ const source = require('vinyl-source-stream');
 const path = require('path');
 const glob = require('glob');
 const eslint = require('gulp-eslint');
+const runSequence = require('run-sequence');
 
 const bundleJS = function(fullFilePath) {
   const browserifyBundles = browserify({
@@ -82,6 +83,23 @@ gulp.task('scripts:lint', function() {
   return stream;
 });
 
-gulp.task('scripts', ['scripts:lint'], function() {
+gulp.task('scripts:transpile', function() {
   return build();
+});
+
+gulp.task('scripts:copyNode', function() {
+  return gulp.src([
+    '!' + path.join(GLOBAL.config.src, 'browser', '**', '*.js'),
+    path.join(GLOBAL.config.src, '**', '*.js')
+  ])
+  .pipe(gulp.dest(GLOBAL.config.dest));
+});
+
+gulp.task('scripts', ['scripts:lint'], function(cb) {
+  runSequence(
+    [
+      'scripts:copyNode',
+      'scripts:transpile'
+    ],
+    cb);
 });

@@ -33,8 +33,8 @@
   <script src="/node_modules/chai/chai.js"></script>
   <script src="/node_modules/mocha/mocha.js"></script>
 
-  <!-- SW Helper -->
-  <script src="/src/mocha/utils.js"></script>
+  <!-- sw-testing-helper -->
+  <script src="/build/browser/mocha-utils.js"></script>
 
   <script>mocha.setup({
     ui: 'bdd'
@@ -52,11 +52,11 @@
 
   <script>
     (function() {
-      // should adds objects to primitives which requires this call to be made
+      // should adds objects to prototypes which requires this call to be made
       // before any tests are run.
       window.chai.should();
 
-      window.goog.MochaUtils.startMochaTest()
+      window.goog.mochaUtils.startInBrowserMochaTests()
       .then(results => {
         window.testsuite = results;
       });

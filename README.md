@@ -2,61 +2,191 @@
 
 [![Build Status](https://travis-ci.org/GoogleChrome/sw-testing-helpers.svg?branch=master)](https://travis-ci.org/GoogleChrome/sw-testing-helpers) [![Dependency Status](https://david-dm.org/GoogleChrome/sw-testing-helpers.svg)](https://david-dm.org/GoogleChrome/sw-testing-helpers) [![devDependency Status](https://david-dm.org/GoogleChrome/sw-testing-helpers/dev-status.svg)](https://david-dm.org/GoogleChrome/sw-testing-helpers#info=devDependencies)
 
-This Repo is largely to share code across several libraries being developed
-by the Web DevRel team.
-
-One thing to note, these helper methods exist to layer on helpers around the
-the tests.
-
-A typical test suite would do the following:
-- Start a browser using helper methods from `automated-browser-testing.js`
-- Load a page in that browser which will run mocha tests.
-    - In the page use `window.goog.MochaUtils.startMochaTest()` which runs
-    the mocha tests and returns a predefined format of tests to set
-    on the window object.
-    - Some tests in a page may use
-    `window.goog.WindowUtils.runSWMochaTests('/sw.js')` to run mocha tests in a
-    service worker and wait for the result.
-      - In the service worker import `/build/browser/sw-utils.js` to manage
-      messaging between the page and the service worker.
-
 ## Running Cross Browser Tests
 
-For examples of how to start tests in Chrome and Firefox in an automated
-fashion look at `/test/automated-browser-tests.js`.
+1. Get the discoverable browsers in the current environment:
 
-## Mocha Tests
+    ``` javascript
+    const automatedBrowserTesting = require('sw-testing-helpers').automatedBrowserTesting;
+    const discoverableBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
+    discoverableBrowsers.forEach(webDriverBrowser => {
+      // See WebDriverBrowser docs for more info
+    });
+    ```
 
-There are some helpers in this repo to help with running Mocha tests in
-a browser and / or in a service worker.
+1. Start a mocha test in a browser like so:
 
-View the following files for how to use this library:
-- To start a test suite that returns a promise when it's completed the test
-suite, view `/test/browser-tests/index.html`.
-- To start a set of mocha tests in a service worker (initiated from an
-  in page test), view `/test/browser-tests/window-utils/run-sw-mocha-tests.js`
+    ``` javascript
+    const mochaUtils = require('sw-testing-helpers').mochaUtils;
+    mochaUtils.startWebDriverMochaTests(
+      browserInfo.getPrettyName(),
+      globalDriverReference,
+      `${testServerURL}/test/browser-tests/`
+    )
+    .then(testResults => {
+      if (testResults.failed.length > 0) {
+        const errorMessage = mochaHelper.prettyPrintErrors(
+          browserInfo.getPrettyName(),
+          testResults
+        );
 
-## Publishing Docs and / or Project
+        throw new Error(errorMessage);
+      }
+    });
+    ```
 
-There are two shell scripts that help with deploying docs to github pages
-and / or help publish your project to NPM with tagging to git.
+## Browser Mocha Tests
 
-The two shell scripts to look at are:
+To run tests in the browser that will automatically return the results
+in a friendly format add the following to your mocha test page:
 
-- `/project/publish-docs.sh`
-- `/project/publish-release.sh`
+``` html
+<!-- sw-testing-helper -->
+<script src="/node_modules/sw-testing-helper/browser/mocha-utils.js"></script>
 
-Instructions on how to use these shell scripts can be found in the comments
-at the top of the docs. They rely on npm run scripts to perform specific
-actions.
+<script>mocha.setup({
+  ui: 'bdd'
+})</script>
 
-## Doc Template
+<!-- Add test scripts here -->
 
-For a few projects it made sense to have a template for doc pages, just to
-manage the versions of docs as well as keep a version of the docs for the
-master branch of a doc.
+<script>
+  (function() {
+    // should adds objects to prototypes which requires this call to be made
+    // before any tests are run.
+    window.chai.should();
 
-This is all kept in `/docs-template/`.
+    window.goog.mochaUtils.startInBrowserMochaTests()
+    .then(results => {
+      window.testsuite = results;
+    });
+  })();
+</script>
+```
+
+## Service Worker Mocha Tests
+
+If you want to run a set of unit tests in a service worker you can start them
+and get the results as follows:
+
+1. In your web page create your unit test as follows:
+
+    ```javascript
+    it('should perform sw tests', function() {
+      return window.goog.mochaUtils.startServiceWorkerMochaTests(SERVICE_WORKER_PATH + '/test-sw.js')
+      .then(testResults => {
+        if (testResults.failed.length > 0) {
+          const errorMessage = window.goog.mochaUtils
+            .prettyPrintErrors(loadedSW, testResults);
+          throw new Error(errorMessage);
+        }
+      });
+    }
+    ```
+
+1. Inside your service worker you need to import, mocha, chai and
+mocha-utils.js (Note: mocha.run() will be automatically called
+by mocha-utils.js):
+
+    ``` javascript
+    importScripts('/node_modules/mocha/mocha.js');
+    importScripts('/node_modules/chai/chai.js');
+    importScripts('/node_modules/sw-testing-helpers/browser/mocha-utils.js');
+
+    self.chai.should();
+    mocha.setup({
+      ui: 'bdd',
+      reporter: null
+    });
+
+    describe('Test Suite in Service Worker', function() {
+      it('shoud ....', function() {
+
+      });
+    });
+    ```
+
+## Publishing Docs
+
+If you wish to automatically publish docs when master is updated and add
+a versioned UI on github pages for release docs, you can make use of the
+`publish-docs.sh` script.
+
+1. In your `.travis.yml` file add the following:
+
+    ```
+    script:
+      - ..........
+      - if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_OS_NAME" = "linux" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+        ./node_modules/sw-testing-helpers/project/publish-docs.sh master;
+      fi
+    ```
+
+1. In your `package.json` file add a `build-docs` run-script that creates
+your docs in a directory called `./docs/`:
+
+    ```
+    "scripts": {
+      "build-docs": "jsdoc -c ./jsdoc.conf"
+    }
+    ```
+
+> PLEASE NOTE: You <strong>MUST</strong> build the docs into the `./docs/`
+> directory!
+
+If you use the `publish-release.sh` script, it will build the docs
+and automatically publish them on github pages under a revisioned name.
+
+<strong>Doc Template</strong>
+
+The UI used by `publish-docs.sh` is the sample project from a
+Jekyll project customised to support versioned docs and will be updated
+in the project whenever sw-testing-helpers is updated.
+
+## Publishing a New Release
+
+When publishing to NPM and / or Bower, there are a few common steps that should
+be taken:
+
+1. Build new version of the source if needed
+1. Ensure that the tests are passing
+1. Bump the version number
+1. Build docs to publish with the new versions
+1. Create a bundle of the necessary files to release
+1. Tag the release on Git and publish on NPM
+1. Publish the docs to Github Pages
+
+The `publish-release.sh` does all of the above. It takes a single
+argument of `patch`, `minor` or `major` and will create a new release
+bumping the semver version based on the above argument.
+
+You need to ensure you have the following npm run-scripts:
+
+1. build
+    * This is a chance to perform any build steps your project needs
+    (i.e. `gulp build`).
+1. build-docs
+    * This is a chance to build the docs for the current state of the project.
+1. test
+    * Run tests based on the previous steps to ensure what is release works.
+1. bundle
+    * This command passes in an argument that is the path you should copy
+    files to publish (i.e. src, build, docs, README, LICENSE).
+
+With this you can add the publish-releash script to an npm script:
+
+```
+"scripts": {
+  "publish-release": "./node_modules/sw-testing-helpers/project/publish-release.sh",
+  ....
+}
+```
+
+To publish a patch release:
+
+```
+npm run publish-release patch
+```
 
 ## sw-testing-helpers Docs
 

@@ -28,14 +28,16 @@ describe('Test require of sw-testing-helpers', function() {
   it('should be able get the node utils from package.json main', () => {
     const packageJson = require('../../package.json');
 
-    packageJson.main.should.equal('./src/node/index.js');
+    packageJson.main.should.equal('./index.js');
   });
 
   it('should be able get the node utils from package.json main', () => {
     const packageJson = require('../../package.json');
 
-    const testingHelper = require(path.join('..', '..', packageJson.main));
-
+    // The /project/copy-build-files.sh script will ensure files in build
+    // will be places in the root of the published directory so
+    // check the file is in build
+    const testingHelper = require(path.join('..', '..', 'build', packageJson.main));
     testingHelper.automatedBrowserTesting.should.be.defined;
     testingHelper.TestServer.should.be.defined;
   });

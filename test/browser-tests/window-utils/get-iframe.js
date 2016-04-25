@@ -22,19 +22,19 @@
 
 'use strict';
 
-describe('Test WindowUtils.getIframe()', function() {
+describe('Test swUtils.getIframe()', function() {
   let firstIframeSrc = null;
 
   beforeEach(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   after(function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   it('should create a new iframe with a src starting with /test/iframe', function() {
-    return window.goog.WindowUtils.getIframe()
+    return window.goog.swUtils.getIframe()
     .then(iframe => {
       iframe.should.be.defined;
       iframe.src.should.be.defined;
@@ -45,7 +45,7 @@ describe('Test WindowUtils.getIframe()', function() {
   });
 
   it('should create a new iframe with unique src', function() {
-    return window.goog.WindowUtils.getIframe()
+    return window.goog.swUtils.getIframe()
     .then(iframe => {
       firstIframeSrc.should.not.equal(iframe.src);
     });
@@ -53,10 +53,10 @@ describe('Test WindowUtils.getIframe()', function() {
 
   it('should return the same iframe in the same test', function() {
     let firstIframe = 0;
-    return window.goog.WindowUtils.getIframe()
+    return window.goog.swUtils.getIframe()
     .then(iframe => {
       firstIframe = iframe;
-      return window.goog.WindowUtils.getIframe();
+      return window.goog.swUtils.getIframe();
     })
     .then(iframe => {
       iframe.should.equal(firstIframe);

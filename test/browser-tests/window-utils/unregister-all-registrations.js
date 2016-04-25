@@ -22,12 +22,12 @@
 
 'use strict';
 
-describe('Test WindowUtils.unregisterAllRegistrations()', function() {
+describe('Test swUtils.unregisterAllRegistrations()', function() {
 
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
   it('should resolve with nothing to unregister', function() {
-    return window.goog.WindowUtils.unregisterAllRegistrations();
+    return window.goog.swUtils.unregisterAllRegistrations();
   });
 
   it('should resolve after unregistering service workers', function() {
@@ -36,7 +36,7 @@ describe('Test WindowUtils.unregisterAllRegistrations()', function() {
       return navigator.serviceWorker.register(SERVICE_WORKER_PATH + '/sw-2.js');
     })
     .then(() => {
-      return window.goog.WindowUtils.unregisterAllRegistrations();
+      return window.goog.swUtils.unregisterAllRegistrations();
     })
     .then(() => {
       return navigator.serviceWorker.getRegistrations();

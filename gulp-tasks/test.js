@@ -18,12 +18,12 @@
 'use strict';
 
 const gulp = require('gulp');
-const mocha = require('gulp-mocha');
 const path = require('path');
-const nodeUtils = require('../src/node/index.js');
+const TestServer = require('../src/index').TestServer;
 
 gulp.task('test:manual', function() {
-  nodeUtils.testServer.startServer(path.join(__dirname, '..'), 8888)
+  let testServer = new TestServer();
+  testServer.startServer(path.join(__dirname, '..'), 8888)
   .then(portNumber => {
     console.log('http://localhost:' + portNumber);
   });

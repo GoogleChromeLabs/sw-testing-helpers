@@ -22,12 +22,12 @@
 
 'use strict';
 
-describe('Test WindowUtils.cleanState()', function() {
+describe('Test swUtils.cleanState()', function() {
 
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
   it('should resolve with nothing to clean', function() {
-    return window.goog.WindowUtils.cleanState();
+    return window.goog.swUtils.cleanState();
   });
 
   it('should resolve after unregistering service workers', function() {
@@ -36,7 +36,7 @@ describe('Test WindowUtils.cleanState()', function() {
       return navigator.serviceWorker.register(SERVICE_WORKER_PATH + '/sw-2.js');
     })
     .then(() => {
-      return window.goog.WindowUtils.cleanState();
+      return window.goog.swUtils.cleanState();
     })
     .then(() => {
       return navigator.serviceWorker.getRegistrations();
@@ -58,7 +58,7 @@ describe('Test WindowUtils.cleanState()', function() {
       return cache.put('/', new Response('hello-2'));
     })
     .then(() => {
-      return window.goog.WindowUtils.cleanState();
+      return window.goog.swUtils.cleanState();
     })
     .then(() => {
       return window.caches.keys();
@@ -86,7 +86,7 @@ describe('Test WindowUtils.cleanState()', function() {
       return navigator.serviceWorker.register(SERVICE_WORKER_PATH + '/sw-2.js');
     })
     .then(() => {
-      return window.goog.WindowUtils.cleanState();
+      return window.goog.swUtils.cleanState();
     })
     .then(() => {
       return window.caches.keys();
