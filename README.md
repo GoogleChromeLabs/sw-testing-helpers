@@ -112,7 +112,21 @@ If you wish to automatically publish docs when master is updated and add
 a versioned UI on github pages for release docs, you can make use of the
 `publish-docs.sh` script.
 
-1. In your `.travis.yml` file add the following:
+1. Travis will need to commit to gh-pages, this done by:
+    1. Create Github token here: https://github.com/settings/tokens/new
+    1. Copy the Github Token and encrypt it with the Travis CLI:
+        1. gem install travis
+        1. travis encrypt GH_TOKEN=<Github Token Here>
+    1. Copy the `secure: "<Secure String>"` output
+    1. In your `.travis.yml` file add secure to your environment variables and
+    add the Github path to GH_REF:
+        ```
+        env:
+          global:
+            - secure: "<Output from travis encrypt command>""
+            - GH_REF: github.com/<username>/<repo>.git
+        ```
+1. In your `.travis.yml` file add the following to end of your script:
 
     ```
     script:
