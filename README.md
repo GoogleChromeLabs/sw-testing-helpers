@@ -124,7 +124,7 @@ a versioned UI on github pages for release docs, you can make use of the
         ```
         env:
           global:
-            - secure: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            - secure: "<Output from travis encrypt command>"
             - GH_REF: github.com/<username>/<repo>.git
         ```
 
