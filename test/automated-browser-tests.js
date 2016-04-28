@@ -61,7 +61,6 @@ describe('Perform Browser Tests', function() {
   const queueUnitTest = browserInfo => {
     it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
       globalDriverReference = browserInfo.getSeleniumDriver();
-
       return mochaUtils.startWebDriverMochaTests(
         browserInfo.getPrettyName(),
         globalDriverReference,
@@ -82,7 +81,10 @@ describe('Perform Browser Tests', function() {
 
   const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
-    if (browserInfo.getReleaseName() === 'unstable') {
+    if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
+      browserInfo.getReleaseName() === 'beta') {
+      // Skip V47 of Firefox due to executeScript issue.
+      // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1274639
       return;
     }
 

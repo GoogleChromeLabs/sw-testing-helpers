@@ -125,7 +125,7 @@ class MochaUtils {
    */
   startServiceWorkerMochaTests(swPath) {
     const sendMessage = (swController, testName, timeout) => {
-      return new Promise(function(resolve, reject) {
+      return new Promise((resolve, reject) => {
         var messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function(event) {
           resolve(event.data);
@@ -190,7 +190,9 @@ class MochaUtils {
     return new Promise((resolve, reject) => {
       driver.get(url)
       .then(() => {
-        return driver.executeScript('return window.navigator.userAgent;');
+        return driver.executeScript(function() {
+          return window.navigator.userAgent;
+        });
       })
       .then(userAgent => {
         // This is just to help with debugging so we can get the browser version
@@ -201,9 +203,10 @@ class MochaUtils {
         // This is set in the in browser mocha tests when the tests have finished
         // successfully
         return driver.wait(function() {
-          return driver.executeScript('return ((typeof window.testsuite !== ' +
-            '\'undefined\') && window.testsuite.testResults !== ' +
-            '\'undefined\');');
+          return driver.executeScript(function() {
+            return (typeof window.testsuite !== 'undefined') &&
+              (typeof window.testsuite.testResults !== 'undefined');
+          });
         });
       })
       .then(() => {

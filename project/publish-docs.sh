@@ -63,10 +63,10 @@ echo ""
 echo ""
 echo "Copy docs to gh-pages"
 echo ""
-docLocation="docs/$1"
-rm -rf ./gh-pages/$docLocation
-mkdir -p ./gh-pages/$docLocation
-cp -r ./docs/. ./gh-pages/$docLocation
+docLocation="./gh-pages/docs/$1"
+rm -rf $docLocation
+mkdir -p $docLocation
+cp -r ./docs/. $docLocation
 
 echo ""
 echo ""
@@ -77,7 +77,7 @@ find . -maxdepth 1 ! -name 'docs' ! -name '.*' | xargs rm -rf
 cd ..
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
-cp -r $SCRIPTPATH/../docs-template/. ./gh-pages/
+cp -r "$SCRIPTPATH/../docs-template/." ./gh-pages/
 
 echo ""
 echo ""

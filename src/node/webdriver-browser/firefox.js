@@ -19,7 +19,6 @@
 const which = require('which');
 const firefoxOptions = require('selenium-webdriver/firefox');
 const WebDriverBrowser = require('./web-driver-browser');
-
 /**
  * <p>Handles the prettyName and executable path for Firefox browser.</p>
  *
@@ -41,6 +40,12 @@ class FirefoxWebDriverBrowser extends WebDriverBrowser {
   constructor(release) {
     let prettyName = 'Firefox';
 
+    const ffOptions = new firefoxOptions.Options();
+    // Change this when v47 becomes stable
+    if (release !== 'stable') {
+      ffOptions.useMarionette(true);
+    }
+
     if (release === 'beta') {
       prettyName += ' Beta';
     } else if (release === 'unstable') {
@@ -51,7 +56,7 @@ class FirefoxWebDriverBrowser extends WebDriverBrowser {
       prettyName,
       release,
       'firefox',
-      new firefoxOptions.Options()
+      ffOptions
     );
   }
 
@@ -67,7 +72,9 @@ class FirefoxWebDriverBrowser extends WebDriverBrowser {
         return process.env.FF_BETA_PATH;
       }
     } else if (release === 'unstable') {
-      if (process.env.FF_NIGHTLY_PATH) {
+      if (process.platform === 'darwin') {
+        return '/Applications/FirefoxNightly.app/Contents/MacOS/firefox';
+      } else if (process.env.FF_NIGHTLY_PATH) {
         return process.env.FF_NIGHTLY_PATH;
       }
     }

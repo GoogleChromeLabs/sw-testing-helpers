@@ -58,12 +58,10 @@ describe('Test MochaUtils.startServiceWorkerMochaTests()', function() {
     .catch(() => done());
   });
 
-  it('should reject with sw that has no message listener', function(done) {
+  it('should reject with sw that has no message listener', function() {
     return window.goog.mochaUtils.startServiceWorkerMochaTests(SERVICE_WORKER_PATH + '/sw-1.js')
-    .then(() => done(new Error('Should have rejected')))
-    .catch(err => {
+    .then(() => new Error('Should have rejected'), err => {
       err.message.should.contain('mocha-utils');
-      done();
     });
   });
 

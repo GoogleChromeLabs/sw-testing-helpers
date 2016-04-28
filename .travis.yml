@@ -28,7 +28,8 @@ addons:
 before_install:
   # Get firefox beta and extract to tar for the test runner to use.
   - wget 'https://download.mozilla.org/?product=firefox-beta-latest&lang=en-US&os=linux64' -O firefox-beta.tar.bz2 && tar xvjf firefox-beta.tar.bz2
-
+  # Get marionette executable
+  - if [[ "$TRAVIS_OS_NAME" = "linux" ]]; then ./project/get-marionette.sh; fi
 install:
   - npm install
 
