@@ -17,7 +17,7 @@
 'use strict';
 
 const which = require('which');
-const chromeOptions = require('selenium-webdriver/chrome');
+const operaOptions = require('selenium-webdriver/opera');
 const WebDriverBrowser = require('./web-driver-browser');
 
 /**
@@ -26,23 +26,23 @@ const WebDriverBrowser = require('./web-driver-browser');
  * @private
  * @extends WebDriverBrowser
  */
-class ChromeWebDriverBrowser extends WebDriverBrowser {
+class OperaWebDriverBrowser extends WebDriverBrowser {
   constructor(release) {
-    let prettyName = 'Google Chrome';
+    let prettyName = 'Opera';
 
     if (release === 'stable') {
       prettyName += ' Stable';
     } else if (release === 'beta') {
       prettyName += ' Beta';
     } else if (release === 'unstable') {
-      prettyName += ' Dev / Canary';
+      prettyName += ' Developer';
     }
 
     super(
       prettyName,
       release,
-      'chrome',
-      new chromeOptions.Options()
+      'opera',
+      new operaOptions.Options()
     );
   }
 
@@ -50,24 +50,24 @@ class ChromeWebDriverBrowser extends WebDriverBrowser {
     try {
       if (this._release === 'stable') {
         if (process.platform === 'darwin') {
-          return '/Applications/Google Chrome.app/' +
-            'Contents/MacOS/Google Chrome';
+          return '/Applications/Opera.app/' +
+            'Contents/MacOS/Opera';
         } else if (process.platform === 'linux') {
-          return which.sync('google-chrome');
+          return which.sync('opera');
         }
       } else if (this._release === 'beta') {
         if (process.platform === 'darwin') {
-          return '/Applications/Google Chrome Beta.app/' +
-            'Contents/MacOS/Google Chrome Beta';
+          return '/Applications/Opera Beta.app/' +
+            'Contents/MacOS/Opera';
         } else if (process.platform === 'linux') {
-          return which.sync('google-chrome-beta');
+          return which.sync('opera-beta');
         }
       } else if (this._release === 'unstable') {
         if (process.platform === 'darwin') {
-          return '/Applications/Google Chrome Canary.app/' +
-            'Contents/MacOS/Google Chrome Canary';
+          return '/Applications/Opera Developer.app/' +
+            'Contents/MacOS/Opera';
         } else if (process.platform === 'linux') {
-          return which.sync('google-chrome-unstable');
+          return which.sync('opera-developer');
         }
       }
     } catch (err) {}
@@ -76,10 +76,10 @@ class ChromeWebDriverBrowser extends WebDriverBrowser {
   }
 
   getVersionNumber() {
-    const chromeVersion = this.getRawVersionString();
-    const regexMatch = chromeVersion.match(/(\d+).\d+.\d+.\d+/);
+    const operaVersion = this.getRawVersionString();
+    const regexMatch = operaVersion.match(/(\d+).\d+.\d+.\d+/);
     if (regexMatch === null) {
-      console.warn('Unable to parse version number from Firefox',
+      console.warn('Unable to parse version number from Opera',
         this._executablePath);
       return false;
     }
@@ -88,4 +88,4 @@ class ChromeWebDriverBrowser extends WebDriverBrowser {
   }
 }
 
-module.exports = ChromeWebDriverBrowser;
+module.exports = OperaWebDriverBrowser;

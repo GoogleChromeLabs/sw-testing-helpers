@@ -55,7 +55,14 @@ describe('Perform Browser Tests', function() {
   afterEach(function() {
     this.timeout(10000);
 
-    return automatedBrowserTesting.killWebDriver(globalDriverReference);
+    if (!globalDriverReference) {
+      return;
+    }
+
+    return automatedBrowserTesting.killWebDriver(globalDriverReference)
+    .then(() => {
+      globalDriverReference = null;
+    });
   });
 
   const queueUnitTest = browserInfo => {
@@ -77,14 +84,35 @@ describe('Perform Browser Tests', function() {
         }
       });
     });
+
+    it(`should have a version number for ${browserInfo.getPrettyName()}`, () => {
+      (typeof browserInfo.getVersionNumber() === 'number').should.equal(true);
+    });
+
+    it(`should have a version number for ${browserInfo.getPrettyName()}`, () => {
+      (typeof browserInfo.getRawVersionString() === 'string').should.equal(true);
+      (browserInfo.getRawVersionString().length > 0).should.equal(true);
+    });
   };
 
   const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
+    // Only skip bad tests on Travis - not locally
+    if (process.env.TRAVIS) {
+      if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
+        browserInfo.getVersionNumber() <= 49) {
+        return;
+      } else if (browserInfo.getSeleniumBrowserId() === 'opera' &&
+        browserInfo.getVersionNumber() <= 39) {
+        // Opera can't unregister server workers when run with selenium
+        return;
+      }
+    }
+
+    // Skip bad tests locally
     if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
-      browserInfo.getReleaseName() === 'beta') {
-      // Skip V47 of Firefox due to executeScript issue.
-      // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1274639
+      browserInfo.getVersionNumber() <= 47) {
+      // There is a bug in FF 47 that prevents Marionette working - skipping;
       return;
     }
 

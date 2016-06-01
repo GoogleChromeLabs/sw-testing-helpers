@@ -16,6 +16,7 @@
 
 'use strict';
 
+const execSync = require('child_process').execSync;
 const fs = require('fs');
 const webdriver = require('selenium-webdriver');
 
@@ -46,7 +47,11 @@ class WebDriverBrowser {
       throw new Error('Unexpected browser release given: ', release);
     }
 
-    if (seleniumBrowserId !== 'chrome' && seleniumBrowserId !== 'firefox') {
+    if (
+      seleniumBrowserId !== 'chrome' &&
+      seleniumBrowserId !== 'firefox' &&
+      seleniumBrowserId !== 'opera'
+    ) {
       throw new Error('Unexpected browser ID given: ', seleniumBrowserId);
     }
 
@@ -54,10 +59,12 @@ class WebDriverBrowser {
     this._release = release;
     this._seleniumBrowserId = seleniumBrowserId;
     this._seleniumOptions = seleniumOptions;
-    this._executablePath = this._getExecutablePath(release);
+    this._executablePath = this._getExecutablePath();
 
     if (seleniumOptions.setChromeBinaryPath) {
       seleniumOptions.setChromeBinaryPath(this._executablePath);
+    } else if (seleniumOptions.setOperaBinaryPath) {
+      seleniumOptions.setOperaBinaryPath(this._executablePath);
     } else if (seleniumOptions.setBinary) {
       seleniumOptions.setBinary(this._executablePath);
     } else {
@@ -68,6 +75,33 @@ class WebDriverBrowser {
   _getExecutablePath() {
     throw new Error('_getExecutablePath() must be overriden by subclasses');
   }
+
+  /**
+   * If you need to identify a browser based on it's version number but
+   * the high level version number isn't specific enough, you can use the
+   * raw version string (this will be the result of calling the browser
+   * executable with an appropriate flag to get the version)
+   * @return {String} Raw string that identifies the browser
+   */
+  getRawVersionString() {
+    return execSync(this._executablePath + ' --version')
+      .toString();
+  }
+
+  /* eslint-disable valid-jsdoc */
+  /**
+   * <p>This method returns an integer if it can be determined from
+   * the browser executabl.</p>
+   *
+   * <p>A scenario where it will be unable to produce a valid version
+   * is if the browsers executable path can't be found.</p>
+   *
+   * @return {Integer} Version number if it can be found
+   */
+  getVersionNumber() {
+    throw new Error('getVersionNumber() must be overriden by subclasses');
+  }
+  /* eslint-enable valid-jsdoc */
 
   /**
    * <p>This method returns true if the instance can produce a valid

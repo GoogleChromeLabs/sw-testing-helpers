@@ -18,6 +18,7 @@
 
 const ChromeWebDriverBrowser = require('./webdriver-browser/chrome');
 const FirefoxWebDriverBrowser = require('./webdriver-browser/firefox');
+const OperaWebDriverBrowser = require('./webdriver-browser/opera');
 
 /**
  * AutomatedBrowserTesting is a class that makes
@@ -57,7 +58,10 @@ class AutomatedBrowserTesting {
       new ChromeWebDriverBrowser('unstable'),
       new FirefoxWebDriverBrowser('stable'),
       new FirefoxWebDriverBrowser('beta'),
-      new FirefoxWebDriverBrowser('unstable')
+      new FirefoxWebDriverBrowser('unstable'),
+      new OperaWebDriverBrowser('stable'),
+      new OperaWebDriverBrowser('beta'),
+      new OperaWebDriverBrowser('unstable')
     ];
 
     webdriveBrowsers = webdriveBrowsers.filter(webdriverBrowser => {

@@ -17,6 +17,7 @@
 'use strict';
 
 const which = require('which');
+const path = require('path');
 const firefoxOptions = require('selenium-webdriver/firefox');
 const WebDriverBrowser = require('./web-driver-browser');
 /**
@@ -41,12 +42,12 @@ class FirefoxWebDriverBrowser extends WebDriverBrowser {
     let prettyName = 'Firefox';
 
     const ffOptions = new firefoxOptions.Options();
-    // Change this when v47 becomes stable
-    if (release !== 'stable') {
-      ffOptions.useMarionette(true);
-    }
+    // Required since v47
+    ffOptions.useMarionette(true);
 
-    if (release === 'beta') {
+    if (release === 'stable') {
+      prettyName += ' Stable';
+    } else if (release === 'beta') {
       prettyName += ' Beta';
     } else if (release === 'unstable') {
       prettyName += ' Nightly';
@@ -60,26 +61,52 @@ class FirefoxWebDriverBrowser extends WebDriverBrowser {
     );
   }
 
-  _getExecutablePath(release) {
-    if (release === 'stable') {
+  _getExecutablePath() {
+    if (this._release === 'stable') {
+      if (process.env.FF_STABLE_PATH) {
+        return process.env.FF_STABLE_PATH;
+      }
+
       if (process.platform === 'darwin') {
         return '/Applications/Firefox.app/Contents/MacOS/firefox';
       } else if (process.platform === 'linux') {
         return which.sync('firefox');
       }
-    } else if (release === 'beta') {
+    } else if (this._release === 'beta') {
       if (process.env.FF_BETA_PATH) {
         return process.env.FF_BETA_PATH;
       }
-    } else if (release === 'unstable') {
-      if (process.platform === 'darwin') {
-        return '/Applications/FirefoxNightly.app/Contents/MacOS/firefox';
-      } else if (process.env.FF_NIGHTLY_PATH) {
+
+      // Last ditch attempt to find ff beta installed
+      // with project/downloads/firefox-beta.sh
+      return path.join(__dirname, '..', '..', '..', 'firefox-beta',
+        'firefox');
+    } else if (this._release === 'unstable') {
+      if (process.env.FF_NIGHTLY_PATH) {
         return process.env.FF_NIGHTLY_PATH;
+      } else if (process.platform === 'darwin') {
+        return '/Applications/FirefoxNightly.app/Contents/MacOS/firefox';
       }
+
+      // Last ditch attempt to find ff beta installed
+      // with project/downloads/firefox-nightly.sh
+      return path.join(__dirname, '..', '..', '..', 'firefox-nightly',
+        'firefox');
     }
 
     return null;
+  }
+
+  getVersionNumber() {
+    const firefoxVersion = this.getRawVersionString();
+    const regexMatch = firefoxVersion.match(/(\d\d).\d/);
+    if (regexMatch === null) {
+      console.warn('Unable to parse version number from Firefox',
+        this._executablePath);
+      return false;
+    }
+
+    return parseInt(regexMatch[1], 10);
   }
 }
 

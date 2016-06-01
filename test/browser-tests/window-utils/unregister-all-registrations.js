@@ -23,7 +23,6 @@
 'use strict';
 
 describe('Test swUtils.unregisterAllRegistrations()', function() {
-
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
   it('should resolve with nothing to unregister', function() {

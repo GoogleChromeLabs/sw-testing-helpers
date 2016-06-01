@@ -7,7 +7,7 @@
     "build": "gulp",
     "build-docs": "jsdoc -c ./jsdoc.conf",
     "bundle": "./project/copy-build-files.sh",
-    "test": "gulp scripts:lint && mocha"
+    "test": "npm run build && gulp scripts:lint && mocha"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "gulp-uglify": "^1.5.3",
     "jsdoc": "^3.4.0",
     "node-fetch": "^1.5.0",
+    "operadriver": "^0.2.2",
     "require-dir": "^0.3.0",
     "rollupify": "^0.3.1",
     "run-sequence": "^1.1.5",
