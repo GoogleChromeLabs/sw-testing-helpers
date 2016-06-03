@@ -98,7 +98,7 @@ describe('Perform Browser Tests', function() {
   const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
     // Only skip bad tests on Travis - not locally
-    if (process.env.TRAVIS) {
+    if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
       if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
         browserInfo.getVersionNumber() <= 49) {
         return;

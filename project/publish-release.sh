@@ -17,6 +17,9 @@ set -e
 #
 # - Create a script at './project/copy-build-files.sh'
 #
+# - NOTE: if you need to alter your testing for this script, you can use
+#   process.env.RELEASE_SCRIPT
+#
 #########################################################################
 
 if [ "$BASH_VERSION" = '' ]; then
@@ -44,6 +47,8 @@ if [[ $currentBranch != "master" ]]; then
   echo "    This script must be run from the master branch.";
   exit 1;
 fi
+
+export RELEASE_SCRIPT=true
 
 echo ""
 echo "Building Library"

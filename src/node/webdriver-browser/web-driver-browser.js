@@ -192,6 +192,7 @@ class WebDriverBrowser {
       .forBrowser(this.getSeleniumBrowserId())
       .setChromeOptions(this.getSeleniumOptions())
       .setFirefoxOptions(this.getSeleniumOptions())
+      .setOperaOptions(this.getSeleniumOptions())
       .build();
   }
 }
