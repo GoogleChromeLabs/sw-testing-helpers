@@ -89,7 +89,7 @@ mkdir -p _data
 DOCS_INFO_OUTPUT="./_data/gendoclist.yml"
 echo "# Auto-generated from the sw-testing-helper module" >> $DOCS_INFO_OUTPUT
 echo "releases:" >> $DOCS_INFO_OUTPUT
-RELEASE_DIRECTORIES=$(find ./docs/releases/ -maxdepth 1 -mindepth 1 -type d -printf '%f\n' | sort --version-sort --reverse);
+RELEASE_DIRECTORIES=$(find ./docs/releases/ -maxdepth 1 -mindepth 1 -type d | xargs -n 1 basename | sort --version-sort --reverse);
 for releaseDir in $RELEASE_DIRECTORIES; do
   if [ -f ./docs/releases/$releaseDir/index.html ]; then
     echo "    - $releaseDir" >> $DOCS_INFO_OUTPUT
@@ -98,7 +98,7 @@ for releaseDir in $RELEASE_DIRECTORIES; do
   fi
 done
 echo "docs:" >> $DOCS_INFO_OUTPUT
-DOC_DIRECTORIES=$(find ./docs/ -maxdepth 1 -mindepth 1 -type d -printf '%f\n');
+DOC_DIRECTORIES=$(find ./docs/ -maxdepth 1 -mindepth 1 -type d | xargs -n 1 basename);
 for docDir in $DOC_DIRECTORIES; do
   if [ "$docDir" = 'releases' ]; then
     continue
