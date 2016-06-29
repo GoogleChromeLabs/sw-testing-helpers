@@ -32,28 +32,40 @@ describe('Test swUtils.getAllCachedAssets()', function() {
     return window.goog.swUtils.cleanState();
   });
 
-  it('should reject with no arugments', function(done) {
+  it('should reject with no arugments', function() {
     return window.goog.swUtils.getAllCachedAssets()
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject with array arugment', function(done) {
+  it('should reject with array arugment', function() {
     return window.goog.swUtils.getAllCachedAssets([])
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject with object arugment', function(done) {
+  it('should reject with object arugment', function() {
     return window.goog.swUtils.getAllCachedAssets({})
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject when a non-existant cache name is given', function(done) {
+  it('should reject when a non-existant cache name is given', function() {
     return window.goog.swUtils.getAllCachedAssets('no-cache-here')
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
   it('should resolve when an existing cache name is given', function() {

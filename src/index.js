@@ -19,7 +19,6 @@
 
 /* eslint-env node */
 
-const AutomatedBrowserTesting = require('./node/automated-browser-testing');
 const TestServer = require('./node/test-server');
 const mochaUtils = require('./utils/mocha');
 
@@ -31,19 +30,15 @@ const mochaUtils = require('./utils/mocha');
  * parameters</p>
  *
  * <p><pre><code>require('sw-testing-helpers').TestServer;
- * require('sw-testing-helpers').automatedBrowserTesting;
  * require('sw-testing-helpers').mochaUtils;</code></pre></p>
  *
  * @module sw-testing-helpers
  * @property {TestServer} TestServer                             The TestServer class
  * that can be extended and instantiated.
- * @property {AutomatedBrowserTesting} automatedBrowserTesting   An instance of
- * the AutomatedBrowserTesting class.
  * @property {MochaUtils} mochaUtils                             An instance of
  * the MochaUtils class.
  */
 module.exports = {
   TestServer: TestServer,
-  automatedBrowserTesting: new AutomatedBrowserTesting(),
   mochaUtils: mochaUtils
 };

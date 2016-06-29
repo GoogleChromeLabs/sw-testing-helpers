@@ -25,7 +25,6 @@ const buffer = require('vinyl-buffer');
 const source = require('vinyl-source-stream');
 const path = require('path');
 const glob = require('glob');
-const eslint = require('gulp-eslint');
 const runSequence = require('run-sequence');
 
 const bundleJS = function(fullFilePath) {
@@ -71,18 +70,6 @@ const build = function() {
   }));
 };
 
-gulp.task('scripts:lint', function() {
-  let stream = gulp.src(GLOBAL.config.src + '/**/*.js')
-  .pipe(eslint())
-  .pipe(eslint.format());
-
-  if (GLOBAL.config.env === 'prod') {
-    stream = stream.pipe(eslint.failAfterError());
-  }
-
-  return stream;
-});
-
 gulp.task('scripts:transpile', function() {
   return build();
 });
@@ -95,7 +82,7 @@ gulp.task('scripts:copyNode', function() {
   .pipe(gulp.dest(GLOBAL.config.dest));
 });
 
-gulp.task('scripts', ['scripts:lint'], function(cb) {
+gulp.task('scripts', function(cb) {
   runSequence(
     [
       'scripts:copyNode',

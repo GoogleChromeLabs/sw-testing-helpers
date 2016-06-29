@@ -25,11 +25,6 @@
 const path = require('path');
 
 describe('Test require of sw-testing-helpers', function() {
-  it('should be able get the node utils from package.json main', () => {
-    const packageJson = require('../../package.json');
-
-    packageJson.main.should.equal('./index.js');
-  });
 
   it('should be able get the node utils from package.json main', () => {
     const packageJson = require('../../package.json');
@@ -38,7 +33,7 @@ describe('Test require of sw-testing-helpers', function() {
     // will be places in the root of the published directory so
     // check the file is in build
     const testingHelper = require(path.join('..', '..', 'build', packageJson.main));
-    testingHelper.automatedBrowserTesting.should.be.defined;
+    testingHelper.mochaUtils.should.be.defined;
     testingHelper.TestServer.should.be.defined;
   });
 });

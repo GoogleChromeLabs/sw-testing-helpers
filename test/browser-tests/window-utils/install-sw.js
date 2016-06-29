@@ -34,34 +34,49 @@ describe('Test swUtils.installSW()', function() {
     return window.goog.swUtils.cleanState();
   });
 
-  it('should reject with no arugments', function(done) {
+  it('should reject with no arugments', function() {
     return window.goog.swUtils.installSW()
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject with array arugment', function(done) {
+  it('should reject with array arugment', function() {
     return window.goog.swUtils.installSW([])
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject with object arugment', function(done) {
+  it('should reject with object arugment', function() {
     return window.goog.swUtils.installSW({})
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject with invalid sw path', function(done) {
+  it('should reject with invalid sw path', function() {
     return window.goog.swUtils.installSW(SERVICE_WORKER_PATH + '/sw-doesnt-exist.js')
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
-  it('should reject with sw that fails to install', function(done) {
+  it('should reject with sw that fails to install', function() {
     return window.goog.swUtils.installSW(SERVICE_WORKER_PATH + '/sw-broken-install.js')
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {
+      // Expected error thrown
+    });
   });
 
   it('should resolve once the sw installs', function() {

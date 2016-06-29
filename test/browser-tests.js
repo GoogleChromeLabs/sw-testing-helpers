@@ -21,9 +21,10 @@
 
 require('chai').should();
 const path = require('path');
+const seleniumAssistant = require('selenium-assistant');
+
 const mochaHelper = require('../build/utils/mocha.js');
 const SWTestingHelpers = require('../build/index.js');
-const automatedBrowserTesting = SWTestingHelpers.automatedBrowserTesting;
 const mochaUtils = SWTestingHelpers.mochaUtils;
 const TestServer = SWTestingHelpers.TestServer;
 
@@ -59,7 +60,7 @@ describe('Perform Browser Tests', function() {
       return;
     }
 
-    return automatedBrowserTesting.killWebDriver(globalDriverReference)
+    return seleniumAssistant.killWebDriver(globalDriverReference)
     .then(() => {
       globalDriverReference = null;
     });
@@ -67,12 +68,17 @@ describe('Perform Browser Tests', function() {
 
   const queueUnitTest = browserInfo => {
     it(`should pass all tests in ${browserInfo.getPrettyName()}`, () => {
-      globalDriverReference = browserInfo.getSeleniumDriver();
-      return mochaUtils.startWebDriverMochaTests(
-        browserInfo.getPrettyName(),
-        globalDriverReference,
-        `${testServerURL}/test/browser-tests/`
-      )
+      return browserInfo.getSeleniumDriver()
+      .then(driver => {
+        globalDriverReference = driver;
+      })
+      .then(() => {
+        return mochaUtils.startWebDriverMochaTests(
+          browserInfo.getPrettyName(),
+          globalDriverReference,
+          `${testServerURL}/test/browser-tests/`
+        );
+      })
       .then(testResults => {
         if (testResults.failed.length > 0) {
           const errorMessage = mochaHelper.prettyPrintErrors(
@@ -84,23 +90,14 @@ describe('Perform Browser Tests', function() {
         }
       });
     });
-
-    it(`should have a version number for ${browserInfo.getPrettyName()}`, () => {
-      (typeof browserInfo.getVersionNumber() === 'number').should.equal(true);
-    });
-
-    it(`should have a version number for ${browserInfo.getPrettyName()}`, () => {
-      (typeof browserInfo.getRawVersionString() === 'string').should.equal(true);
-      (browserInfo.getRawVersionString().length > 0).should.equal(true);
-    });
   };
 
-  const automatedBrowsers = automatedBrowserTesting.getDiscoverableBrowsers();
+  const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
     // Only skip bad tests on Travis - not locally
     if (process.env.TRAVIS || process.env.RELEASE_SCRIPT) {
       if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
-        browserInfo.getVersionNumber() <= 49) {
+        browserInfo.getVersionNumber() <= 50) {
         return;
       } else if (browserInfo.getSeleniumBrowserId() === 'opera' &&
         browserInfo.getVersionNumber() <= 39) {
@@ -113,6 +110,11 @@ describe('Perform Browser Tests', function() {
     if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
       browserInfo.getVersionNumber() <= 47) {
       // There is a bug in FF 47 that prevents Marionette working - skipping;
+      return;
+    }
+
+    if (browserInfo.getReleaseName() === 'unstable') {
+      // Stick to stable and beta for reliable tests
       return;
     }
 
