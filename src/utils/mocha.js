@@ -188,7 +188,7 @@ class MochaUtils {
     // selenium-webdriver API seems to using some custom promise
     // implementation that has slight behaviour differences.
     return new Promise((resolve, reject) => {
-      driver.get(url)
+      const driverPromise = driver.get(url)
       .then(() => {
         return driver.executeScript(function() {
           return window.navigator.userAgent;
@@ -216,8 +216,13 @@ class MochaUtils {
       .then(testResults => {
         // Resolve the outer promise to get out of the webdriver promise chain
         resolve(testResults);
-      })
-      .catch(reject);
+      });
+
+      if (driverPromise.thenCatch) {
+        driverPromise.thenCatch(reject);
+      } else {
+        driverPromise.catch(reject);
+      }
     });
   }
 

@@ -1,29 +1,22 @@
 const seleniumAssistant = require('selenium-assistant');
 
-const browserDownloads = [
+const promises = [
   seleniumAssistant.downloadFirefoxDriver(),
-  seleniumAssistant.downloadBrowser('chrome', 'stable'),
-  seleniumAssistant.downloadBrowser('chrome', 'beta'),
-  seleniumAssistant.downloadBrowser('chrome', 'unstable'),
-  seleniumAssistant.downloadBrowser('firefox', 'stable'),
-  seleniumAssistant.downloadBrowser('firefox', 'beta'),
-  seleniumAssistant.downloadBrowser('firefox', 'unstable')
+  seleniumAssistant.downloadBrowser('chrome', 'stable', true),
+  seleniumAssistant.downloadBrowser('chrome', 'beta', true),
+  seleniumAssistant.downloadBrowser('chrome', 'unstable', true),
+  seleniumAssistant.downloadBrowser('firefox', 'stable', true),
+  seleniumAssistant.downloadBrowser('firefox', 'beta', true),
+  seleniumAssistant.downloadBrowser('firefox', 'unstable', true)
 ];
 
-// Download Opera on OS X results in a pop-up with questions - no automation
-if (process.platform !== 'darwin') {
-  browserDownloads.push(
-    seleniumAssistant.downloadBrowser('opera', 'stable')
-  );
-  browserDownloads.push(
-    seleniumAssistant.downloadBrowser('opera', 'beta')
-  );
-  browserDownloads.push(
-    seleniumAssistant.downloadBrowser('opera', 'unstable')
-  );
+if (process.platform === 'linux') {
+  promises.push(seleniumAssistant.downloadBrowser('opera', 'stable', true));
+  promises.push(seleniumAssistant.downloadBrowser('opera', 'beta', true));
+  promises.push(seleniumAssistant.downloadBrowser('opera', 'unstable', true));
 }
 
-Promise.all(browserDownloads)
+Promise.all(promises)
 .then(() => {
   console.log('Browser download complete.');
 });

@@ -36,6 +36,8 @@ describe('Perform Browser Tests', function() {
 
   // Browser tests can be slow
   this.timeout(60000);
+  // Add retries - browser tests are flakey over selenium
+  this.retries(3);
 
   let globalDriverReference = null;
   let testServer = null;
@@ -92,6 +94,8 @@ describe('Perform Browser Tests', function() {
     });
   };
 
+  seleniumAssistant.printAvailableBrowserInfo();
+
   const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
   automatedBrowsers.forEach(browserInfo => {
     // Only skip bad tests on Travis - not locally
@@ -99,7 +103,8 @@ describe('Perform Browser Tests', function() {
       if (browserInfo.getSeleniumBrowserId() === 'firefox' &&
         browserInfo.getVersionNumber() <= 50) {
         return;
-      } else if (browserInfo.getSeleniumBrowserId() === 'opera' &&
+      } else if ((process.env.TRAVIS || process.env.RELEASE_SCRIPT) &&
+        browserInfo.getSeleniumBrowserId() === 'opera' &&
         browserInfo.getVersionNumber() <= 39) {
         // Opera can't unregister server workers when run with selenium
         return;
@@ -113,8 +118,21 @@ describe('Perform Browser Tests', function() {
       return;
     }
 
-    if (browserInfo.getReleaseName() === 'unstable') {
-      // Stick to stable and beta for reliable tests
+    if ((process.env.TRAVIS || process.env.RELEASE_SCRIPT) &&
+      browserInfo.getSeleniumBrowserId() === 'chrome' &&
+      browserInfo.getVersionNumber() === 54) {
+      return;
+    }
+
+    if ((process.env.TRAVIS || process.env.RELEASE_SCRIPT) &&
+      browserInfo.getReleaseName() === 'unstable') {
+      return;
+    }
+
+    if ((process.env.TRAVIS || process.env.RELEASE_SCRIPT) &&
+      browserInfo.getSeleniumBrowserId() !== 'chrome' &&
+      browserInfo.getSeleniumBrowserId() !== 'firefox' &&
+      browserInfo.getSeleniumBrowserId() !== 'opera') {
       return;
     }
 
