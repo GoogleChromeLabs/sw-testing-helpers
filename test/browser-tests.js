@@ -23,14 +23,12 @@
 const path = require('path');
 const seleniumAssistant = require('selenium-assistant');
 
-const mochaHelper = require('../build/utils/mocha.js');
 const SWTestingHelpers = require('../build/index.js');
 const mochaUtils = SWTestingHelpers.mochaUtils;
 const TestServer = SWTestingHelpers.TestServer;
 
 require('geckodriver');
 require('chromedriver');
-require('operadriver');
 
 require('chai').should();
 
@@ -90,10 +88,13 @@ describe('Perform Browser Tests', function() {
         );
       })
       .then(testResults => {
-        console.log(mochaHelper.prettyPrintResults(testResults));
-
-        if (testResults.failed.length > 0) {
+        if (testResults.failed.length !== 1) {
           throw new Error('Failing Browser Test(s). See log for details.');
+        } else {
+          testResults.failed[0].errMessage.should.equal('I`m an Error. Hi.');
+          if (testResults.failed[0].stack.indexOf('window-utils/serviceworkers/example-tests.js:41') == -1) {
+            throw new Error('The stack trace does not include the correct path of the error.');
+          }
         }
       });
     });
