@@ -8,7 +8,7 @@
     "build-docs": "jsdoc -c ./jsdoc.conf -d",
     "bundle": "./project/copy-build-files.sh",
     "pretest": "node ./test/helpers/download-test-browsers.js",
-    "test": "npm run build && npm run lint && mocha --grep 'should pass all tests in Google Chrome Stable'",
+    "test": "npm run build && npm run lint && mocha",
     "lint": "eslint '.'",
     "publish-release": "publish-release.sh",
     "publish-docs": "publish-docs.sh"
