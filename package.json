@@ -8,7 +8,7 @@
     "build-docs": "jsdoc -c ./jsdoc.conf -d",
     "bundle": "./project/copy-build-files.sh",
     "pretest": "node ./test/helpers/download-test-browsers.js",
-    "test": "npm run build && npm run lint && mocha",
+    "test": "npm run build && npm run lint && mocha --grep 'should pass all tests in Google Chrome Stable'",
     "lint": "eslint '.'",
     "publish-release": "publish-release.sh",
     "publish-docs": "publish-docs.sh"
@@ -26,17 +26,15 @@
     "chai": "^3.5.0",
     "del": "^2.2.0",
     "express": "^4.13.4",
-    "mocha": "^3.0.2",
-    "pullr": "^0.3.2",
-    "which": "^1.2.4"
+    "mocha": "^3.0.2"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.6.0",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
-    "chromedriver": "^2.24.1",
+    "chromedriver": "^2.25.3",
     "eslint": "^3.2.2",
-    "eslint-config-google": "^0.6.0",
+    "eslint-config-google": "^0.7.1",
     "geckodriver": "^1.1.2",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
@@ -46,11 +44,10 @@
     "jsdoc": "^3.4.0",
     "node-fetch": "^1.5.0",
     "npm-publish-scripts": "^2.0.6",
-    "operadriver": "^0.2.2",
     "require-dir": "^0.3.0",
     "rollupify": "^0.3.1",
     "run-sequence": "^1.1.5",
-    "selenium-assistant": "^1.0.0",
+    "selenium-assistant": "^3.0.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

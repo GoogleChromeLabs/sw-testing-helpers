@@ -37,7 +37,9 @@ describe('Example SW Tests', function() {
     (new Date() instanceof Date).should.equal(true);
   });
 
-  it('should throw an error', function() {
-    throw new Error('I`m an Error. Hi.');
+  it('[NOTE: This is designed to be an error in SW. Used to test that errors bubble up same as passed tests. Passing tests while printing a failing error is by design and is "A OK".]', function() {
+    const testError = new Error('I`m an Error. Hi.');
+    console.log(testError.stack);
+    throw testError;
   });
 });

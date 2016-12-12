@@ -40,7 +40,8 @@
  * error reporting.</p>
  *
  * @example <caption>Usage in Browser Window</caption>
- * <script src="/node_modules/sw-testing-helpers/browser/mocha-utils.js"></script>
+ * <script src="/node_modules/sw-testing-helpers/browser/mocha-utils.js">
+ * </script>
  * <script>
  * console.log(window.goog.mochaUtils);
  * </script>
@@ -63,16 +64,20 @@ class MochaUtils {
    */
   startInBrowserMochaTests() {
     return new Promise(resolve => {
+      let topLevelTitle = null;
+      let rawTestData = [];
       let passedTests = [];
       let failedTests = [];
 
       mocha.checkLeaks();
 
-      var runResults = mocha.run();
+      const runResults = mocha.run();
 
       if (runResults.total === 0) {
         resolve({
+          topLevelTitle: topLevelTitle,
           testResults: {
+            raw: rawTestData,
             passed: passedTests,
             failed: failedTests
           }
@@ -83,14 +88,20 @@ class MochaUtils {
       // pass, fail and end events allow up to capture results and
       // determine when to publish test results
       runResults.on('pass', test => {
-        passedTests.push(this._getFriendlyTestResult(test));
+        const parseableTest = this._getFriendlyTestResult(test);
+        rawTestData.push(parseableTest);
+        passedTests.push(parseableTest);
       })
       .on('fail', test => {
-        failedTests.push(this._getFriendlyTestResult(test));
+        const parseableTest = this._getFriendlyTestResult(test);
+        rawTestData.push(parseableTest);
+        failedTests.push(parseableTest);
       })
       .on('end', () => {
         resolve({
+          topLevelTitle: topLevelTitle,
           testResults: {
+            raw: rawTestData,
             passed: passedTests,
             failed: failedTests
           }
@@ -99,13 +110,16 @@ class MochaUtils {
 
       // No tests so end won't be called
       if (mocha.suite.suites.length === 0) {
-        console.warn('No tests found.');
         resolve({
+          topLevelTitle: topLevelTitle,
           testResults: {
+            raw: rawTestData,
             passed: passedTests,
             failed: failedTests
           }
         });
+      } else {
+        topLevelTitle = mocha.suite.suites[0].title;
       }
     });
   }
@@ -123,10 +137,10 @@ class MochaUtils {
    * @return {Promise.<MochaTestResults>}        Promise resolves when the tests
    * in the service worker have completed, returned the results.
    */
-  startServiceWorkerMochaTests(swPath) {
+  registerServiceWorkerMochaTests(swPath) {
     const sendMessage = (swController, testName, timeout) => {
       return new Promise((resolve, reject) => {
-        var messageChannel = new MessageChannel();
+        const messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function(event) {
           resolve(event.data);
         };
@@ -166,10 +180,21 @@ class MochaUtils {
       .then(msgResponse => {
         if (!msgResponse.testResults) {
           throw new Error('Unexpected test result: ' + msgResponse);
+        } else if (msgResponse.testResults.raw.length > 0 && describe) {
+          describe('[SW Internal Results] ' + msgResponse.topLevelTitle,
+            function() {
+              msgResponse.testResults.raw.forEach((testResult) => {
+                it(testResult.title, function() {
+                  if (testResult.state !== 'passed') {
+                    const error = new Error(testResult.errMessage);
+                    error.stack = testResult.stack;
+                    throw error;
+                  }
+                });
+              });
+            }
+          );
         }
-
-        // Print test failues
-        return msgResponse.testResults;
       });
     });
   }
@@ -181,7 +206,8 @@ class MochaUtils {
    * @param  {String} browserName Name to be printed with the browsers UserAgent
    * @param  {WebDriver} driver   Instance of a {@link http://selenium.googlecode.com/git/docs/api/javascript/class_webdriver_WebDriver.html | WebDriver}
    * @param  {String} url         URL of that has mocha tests.
-   * @return {Promise<MochaTestResults>}   Returns the results from the browsers tests
+   * @return {Promise<MochaTestResults>}   Returns the results from the
+   * browsers tests
    */
   startWebDriverMochaTests(browserName, driver, url) {
     return driver.get(url)
@@ -204,48 +230,64 @@ class MochaUtils {
     });
   }
 
+  /**
+   * @private
+   * @param {Object} testResult The Mocha test result to be filtered.
+   * @return {Object} A friendlier interpretation of the mocha test result.
+   */
   _getFriendlyTestResult(testResult) {
     const friendlyResult = {
       parentTitle: testResult.parent.title,
       title: testResult.title,
-      state: testResult.state
+      state: testResult.state,
     };
 
     if (testResult.err) {
       friendlyResult.errMessage = testResult.err.message;
+      friendlyResult.stack = testResult.err.stack;
     }
 
     return friendlyResult;
   }
 
   /**
-   * Present any failed tests in a friendly format. Useful if you are running
-   * tests on a CI like Travis and want to be able to understand the errors
-   * quickly.
-   *
-   * @param  {String} identifier  This will be printed at the top of the output.
-   * It should be something that will help you identify which tests these logs
-   * belong to (i.e. the service worker file, or browser name).
-   * @param  {MochaTestRestuls} testResults The results to log.
-   * @return {String}           The return is a string that can be prited to
-   * standard out. If there are any errors this method will return null.
+   * @param {object} testResults Tests to convert to a friendly message
+   * @return {String} The results in a pretty string.
    */
-  prettyPrintErrors(identifier, testResults) {
-    // Print test failues
-    if (testResults.failed.length > 0) {
-      const failedTests = testResults.failed;
-      let errorMessage = 'Issues in ' + identifier + '.\n\n' + identifier +
-        ' had ' + testResults.failed.length + ' test failures.\n';
-      errorMessage += '------------------------------------------------\n';
-      errorMessage += failedTests.map((failedTest, i) => {
-        return `[Failed Test ${i + 1}]\n` +
-               `    - ${failedTest.parentTitle} > ${failedTest.title}\n` +
-               `        ${failedTest.errMessage}\n`;
-      }).join('\n');
-      errorMessage += '------------------------------------------------\n';
-      return errorMessage;
-    }
-    return null;
+  prettyPrintResults(testResults) {
+    let prettyResultsString = ``;
+    /* eslint-disable no-console */
+    testResults.raw.forEach((testResult) => {
+      let testResultString = ``;
+      switch(testResult.state) {
+        case 'passed':
+          testResultString += '✔️ [Passed] ';
+          break;
+        case 'failed':
+          testResultString += '❌ [Failed] ';
+          break;
+        default:
+          testResultString += '❓ [Unknown] ';
+          break;
+      }
+
+      testResultString += `${testResult.parentTitle} > ` +
+        `${testResult.title}\n`;
+
+      if (testResult.state === 'failed') {
+        const pad = '    ';
+        const indentedStack = testResult.stack.split('\n').join(`\n${pad}`);
+
+        testResultString += `\n${pad}${testResult.errMessage}\n\n`;
+        testResultString += `${pad}[Stack Trace]\n`;
+        testResultString += `${pad}${indentedStack}\n`;
+      }
+
+      prettyResultsString += testResultString + '\n';
+    });
+    /* eslint-enable no-console */
+
+    return prettyResultsString;
   }
 }
 

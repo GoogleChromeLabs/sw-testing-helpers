@@ -8,6 +8,7 @@
     "no-console": 0,
     "padded-blocks": 0,
     "no-multiple-empty-lines": 0,
-    "no-unused-expressions": 0
+    "no-unused-expressions": 0,
+    "no-invalid-this": 0
   }
 }

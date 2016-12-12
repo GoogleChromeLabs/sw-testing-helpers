@@ -26,6 +26,21 @@ describe('Test swUtils.installSW()', function() {
 
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
+  before(function() {
+    return new Promise((resolve, reject) => {
+      // By leaks this is referring to the only thing Propel
+      // should add to the global scope (i.e. window) is goog
+      const scriptElement = document.createElement('script');
+      scriptElement.setAttribute('type', 'text/javascript');
+      scriptElement.src = '/build/browser/sw-utils.js';
+      document.querySelector('head').appendChild(scriptElement);
+      scriptElement.onerror = () => {
+        reject(new Error('Unable to load script.'));
+      };
+      scriptElement.onload = resolve;
+    });
+  });
+
   beforeEach(function() {
     return window.goog.swUtils.cleanState();
   });

@@ -15,6 +15,7 @@
  *
  */
 
+/* global require */
 /* eslint-env browser */
 
 (() => {

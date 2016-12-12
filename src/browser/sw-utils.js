@@ -31,6 +31,9 @@
  * </script>
  */
 class SWUtils {
+  /**
+   * SWUtils constructor should never be called directly.
+   */
   constructor() {
     // The test counter ensures a unique scope between each test.
     // testTime is used to ensure a unique scope between runs of
@@ -58,18 +61,18 @@ class SWUtils {
           'cleanState() to unregister this service?');
       }
 
-      var serviceWorker = registration.installing;
+      let serviceWorker = registration.installing;
 
       // We unregister all service workers after each test - this should
       // always trigger an install state change
-      var stateChangeListener = function() {
-        if (this.state === desiredState) {
+      let stateChangeListener = function(evt) {
+        if (evt.target.state === desiredState) {
           serviceWorker.removeEventListener('statechange', stateChangeListener);
           resolve();
           return;
         }
 
-        if (this.state === 'redundant') {
+        if (evt.target.state === 'redundant') {
           serviceWorker.removeEventListener('statechange', stateChangeListener);
 
           // Must call reject rather than throw error here due to this
@@ -97,7 +100,7 @@ class SWUtils {
    */
   getIframe() {
     return new Promise(resolve => {
-      var existingIframe = document.querySelector('.js-test-iframe');
+      const existingIframe = document.querySelector('.js-test-iframe');
       if (existingIframe) {
         return resolve(existingIframe);
       }
@@ -105,7 +108,7 @@ class SWUtils {
       // This will be used as a unique service worker scope
       this._testCounter++;
 
-      var newIframe = document.createElement('iframe');
+      const newIframe = document.createElement('iframe');
       newIframe.classList.add('js-test-iframe');
       newIframe.addEventListener('load', () => {
         resolve(newIframe);
@@ -157,10 +160,10 @@ class SWUtils {
    */
   installSW(swUrl) {
     return new Promise((resolve, reject) => {
-      var iframe;
+      let iframe;
       this.getIframe()
       .then(newIframe => {
-        var options = null;
+        let options = null;
         if (newIframe) {
           iframe = newIframe;
           options = {scope: newIframe.contentWindow.location.pathname};
@@ -190,10 +193,10 @@ class SWUtils {
    */
   activateSW(swUrl) {
     return new Promise((resolve, reject) => {
-      var iframe;
+      let iframe;
       this.getIframe()
       .then(newIframe => {
-        var options = null;
+        let options = null;
         if (newIframe) {
           options = {scope: newIframe.contentWindow.location.pathname};
           iframe = newIframe;
@@ -218,11 +221,11 @@ class SWUtils {
    *
    * @param  {String} cacheName The name of the cache to get the contents from.
    * @return {Promise.<Object>}           Resolves to an object where the keys
-   * are URLs for the cache responses and the value is the text from the response.
-   * The promise rejects if the cache doesn't exist.
+   * are URLs for the cache responses and the value is the text from the
+   * response. The promise rejects if the cache doesn't exist.
    */
   getAllCachedAssets(cacheName) {
-    var cache = null;
+    let cache = null;
     return window.caches.has(cacheName)
       .then(hasCache => {
         if (!hasCache) {
@@ -249,7 +252,7 @@ class SWUtils {
       .then(cacheRequestResponsePairs => {
         // This method extracts the response streams and pairs
         // them with a url.
-        var output = {};
+        const output = {};
         cacheRequestResponsePairs.forEach(cacheRequestResponsePair => {
           output[cacheRequestResponsePair.request.url] =
             cacheRequestResponsePair.response;
@@ -271,8 +274,8 @@ class SWUtils {
       this.clearAllCaches()
     ])
     .then(() => {
-      var iframeList = document.querySelectorAll('.js-test-iframe');
-      for (var i = 0; i < iframeList.length; i++) {
+      const iframeList = document.querySelectorAll('.js-test-iframe');
+      for (let i = 0; i < iframeList.length; i++) {
         iframeList[i].parentElement.removeChild(iframeList[i]);
       }
     });

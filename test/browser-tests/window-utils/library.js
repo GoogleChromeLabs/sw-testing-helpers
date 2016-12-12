@@ -23,21 +23,23 @@
 'use strict';
 
 describe('Test swUtils Library', function() {
-  it('should load window.goog.swUtils without leaks', function(done) {
-    // By leaks this is referring to the only thing Propel
-    // should add to the global scope (i.e. window) is goog
-    const scriptElement = document.createElement('script');
-    scriptElement.setAttribute('type', 'text/javascript');
-    scriptElement.src = '/build/browser/sw-utils.js';
-    document.querySelector('head').appendChild(scriptElement);
-    scriptElement.onerror = () => {
-      done(new Error('Unable to load script.'));
-    };
-    scriptElement.onload = () => {
-      window.goog.swUtils.should.be.defined;
+  it('should load window.goog.swUtils without leaks', function() {
+    return new Promise((resolve, reject) => {
+      // By leaks this is referring to the only thing Propel
+      // should add to the global scope (i.e. window) is goog
+      const scriptElement = document.createElement('script');
+      scriptElement.setAttribute('type', 'text/javascript');
+      scriptElement.src = '/build/browser/sw-utils.js';
+      document.querySelector('head').appendChild(scriptElement);
+      scriptElement.onerror = () => {
+        reject(new Error('Unable to load script.'));
+      };
+      scriptElement.onload = () => {
+        window.goog.swUtils.should.be.defined;
 
-      done();
-    };
+        resolve();
+      };
+    });
   });
 
   it('should be able to find window.goog.swUtils', () => {

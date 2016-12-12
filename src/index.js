@@ -33,10 +33,9 @@ const mochaUtils = require('./utils/mocha');
  * require('sw-testing-helpers').mochaUtils;</code></pre></p>
  *
  * @module sw-testing-helpers
- * @property {TestServer} TestServer                             The TestServer class
- * that can be extended and instantiated.
- * @property {MochaUtils} mochaUtils                             An instance of
- * the MochaUtils class.
+ * @property {TestServer} TestServer The TestServer class that can be
+ * extended and instantiated.
+ * @property {MochaUtils} mochaUtils An instance of the MochaUtils class.
  */
 module.exports = {
   TestServer: TestServer,

@@ -65,6 +65,9 @@ class TestServer {
     }
   }
 
+  /**
+   * @private
+   */
   _addDefaultRoutes() {
     this._useDefaults = true;
 
@@ -87,12 +90,12 @@ class TestServer {
   /**
    * This will start the express server with the provided port and host.
    *
-   * @param  {String} path                  Path to start the server on (i.e. './')
-   * @param  {Number} [portNumber=0] portNumber        Optional parameter, by default will pick
-   * a random available port.
-   * @param  {String} [host='localhost'] host    Optional parameter, a host to bind
-   * the express server to, by default this is localhost.
-   * @return {Promise<Number>}                      Promise that resolves when the
+   * @param  {String} path Path to start the server on (i.e. './')
+   * @param  {Number} [portNumber=0] portNumber Optional parameter, by
+   * default will pick a random available port.
+   * @param  {String} [host='localhost'] host Optional parameter, a host
+   * to bind the express server to, by default this is localhost.
+   * @return {Promise<Number>} Promise that resolves when the
    * server is started resolving with the port used.
    */
   startServer(path, portNumber, host) {

@@ -25,6 +25,8 @@ gulp.task('test:manual', function() {
   let testServer = new TestServer();
   testServer.startServer(path.join(__dirname, '..'), 8888)
   .then(portNumber => {
+    /* eslint-disable no-console */
     console.log('http://localhost:' + portNumber);
+    /* eslint-enable no-console */
   });
 });
