@@ -33,17 +33,8 @@ require('chromedriver');
 require('chai').should();
 
 describe('Perform Browser Tests', function() {
-  if (process.env.TRAVIS && process.platform === 'darwin') {
-    console.warn('Skipping automated browser tests on Travis OS X.');
-    return;
-  }
-
-  // Browser tests can be slow
   this.timeout(4 * 60 * 1000);
-  // Add retries - browser tests are flakey over selenium
-  if (process.env.TRAVIS) {
-    this.retries(3);
-  }
+  this.retries(3);
 
   let globalDriverReference = null;
   let testServer = null;
