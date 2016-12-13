@@ -1,13 +1,14 @@
-sudo: required
-dist: trusty
 language: node_js
+
 env:
   global:
     - GH_REF: 'github.com/googlechrome/sw-testing-helpers.git'
     - secure: "KQ2R5aEaPNb58/9QPYAqEJCOM+jW7EpEuGOCb8TcluOMqUKAsvMGogB8iyc5CDbvUTGn2bjFidt2UmKisb1V6MALKu68B8q/ZA0HCK+6OzpleniGeRqu1vGxlP6Mrv4xQUbjVc6zfsXKv9dkRK8QEJnF/eeyMMYZKLJGnWsbVpD2h+zmuobTfuwXsNgzc4a4umlz10DhTi01bok30doRgeYgLbhPDePeyBUqYWDgfGQ/MBVPt7CYr0Xp9gHGk3Rw8AjSwoikUtFJsuPlor4JafmDlLKzaxFqdj9HS5SB40kFPsX8gAqX+2A89KAJqLk3bHMyJwk0DQpcDCHejiRWJyOIdF7WJF5RtbKzzG2N7ksJ9huXZ5DGiPXHFjLNeRmRj0CBs+mUSXA6GOag3OZL4+W2qidcjK0gwaqgHNNAjSzs8WcZQS+PpfvO/5zKEe3ozMtvp9SCF/gyN15JWbMEvJfp8ozrd471p1dIRznakEDANmU6KCV/sPKedTcBBO9ZnRIN0Dwux+evrAwVcP28zEpiOWKqLDonOrQuKHBDtsQ0P8KudLKeaIjpv+jTOkfla5ZvOkeTlKLmah43WRzPcL6iyeTzynOrWA+qHUwUcu3Qb16u50NG60uFfaFlQ/CSpdtOYoNIHipDhkk0l0GYTb4q5LLdV2UdXifi/j7nqCE="
+
 cache:
   directories:
     - node_modules
+
 node_js:
   - '6'
   - '7'

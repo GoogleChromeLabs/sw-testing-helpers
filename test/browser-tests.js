@@ -97,6 +97,10 @@ describe('Perform Browser Tests', function() {
   automatedBrowsers.forEach(browserInfo => {
     switch (browserInfo.getSeleniumBrowserId()) {
       case 'firefox':
+        if (browserInfo.getVersionNumber() <= 50) {
+          console.warn('Skipping FF version 50 or less due to travis issues.');
+          return;
+        }
       case 'chrome':
         queueUnitTest(browserInfo);
         break;

@@ -35,7 +35,7 @@
     "chromedriver": "^2.25.3",
     "eslint": "^3.12.1",
     "eslint-config-google": "^0.7.1",
-    "geckodriver": "^1.1.2",
+    "geckodriver": "^1.2.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.1",
     "gulp-mocha": "^3.0.1",
