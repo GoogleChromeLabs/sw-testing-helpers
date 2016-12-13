@@ -39,7 +39,7 @@ describe('Perform Browser Tests', function() {
   }
 
   // Browser tests can be slow
-  this.timeout(60000);
+  this.timeout(4 * 60 * 1000);
   // Add retries - browser tests are flakey over selenium
   if (process.env.TRAVIS) {
     this.retries(3);

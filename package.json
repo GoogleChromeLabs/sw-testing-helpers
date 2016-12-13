@@ -3,9 +3,6 @@
   "version": "0.1.4",
   "description": "A set of helper files used to test Propel and sw-toolbox.",
   "main": "./index.js",
-  "engines": {
-    "node": ">= 6.9.0"
-  },
   "scripts": {
     "build": "gulp",
     "build-docs": "jsdoc -c ./jsdoc.conf -d",
