@@ -101,6 +101,8 @@ describe('Perform Browser Tests', function() {
           console.warn('Skipping FF version 50 or less due to travis issues.');
           return;
         }
+        queueUnitTest(browserInfo);
+        break;
       case 'chrome':
         queueUnitTest(browserInfo);
         break;
