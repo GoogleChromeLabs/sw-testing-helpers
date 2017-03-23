@@ -209,6 +209,31 @@ class SWUtils {
   }
 
   /**
+   * <p>Register a service worker with a unique scope and
+   * create an iframe that can be controlled by that service worker, then
+   * wait until the service worker takes control.</p>
+   *
+   * <p>Useful for testing behavior that assumes the page is already controlled
+   * by a service worker.</p>
+   *
+   * @param  {String} swUrl The url to a service worker file to register
+   * @return {Promise.<HTMLElement>} Resolves with the iframe once the service
+   * worker has taken control.
+   */
+  controlledBySW(swUrl) {
+    return this.activateSW(swUrl).then(iframe => new Promise(resolve => {
+      var iframeSW = iframe.contentWindow.navigator.serviceWorker;
+      if (iframeSW.controller) {
+        resolve(iframe);
+      } else {
+        iframeSW.addEventListener('controllerchange',
+          () => resolve(iframe),
+          {once: true});
+      }
+    }));
+  }
+
+  /**
    * <p>Helper method that checks a cache with a specific name exists before
    * retrieving all the cached responses inside of it.</p>
    *
