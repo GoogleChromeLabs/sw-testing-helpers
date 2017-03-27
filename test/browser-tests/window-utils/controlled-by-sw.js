@@ -19,6 +19,7 @@
 
 /* eslint-disable max-len, no-unused-expressions */
 /* eslint-env browser, mocha */
+/* global chai:false */
 
 'use strict';
 

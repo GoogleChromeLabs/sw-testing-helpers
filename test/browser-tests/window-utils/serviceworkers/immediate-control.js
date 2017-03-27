@@ -1,3 +1,5 @@
+/* global self:false */
+
 // This is used by the controlled-by-sw.js test.
 // It's a service worker that activates & takes control of clients immediately.
 // It specifically does not wrap the calls with event.waitUntil();
