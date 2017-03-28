@@ -16,7 +16,6 @@
  */
 
 /* eslint-env browser */
-/* eslint-disable no-var */
 
 /**
  * <p>SWUtils can be used in a <strong>webpage only</strong>.</p>
@@ -223,7 +222,7 @@ class SWUtils {
    */
   controlledBySW(swUrl) {
     return this.activateSW(swUrl).then(iframe => new Promise(resolve => {
-      var iframeSW = iframe.contentWindow.navigator.serviceWorker;
+      let iframeSW = iframe.contentWindow.navigator.serviceWorker;
       if (iframeSW.controller) {
         resolve(iframe);
       } else {
