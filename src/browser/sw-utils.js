@@ -16,6 +16,7 @@
  */
 
 /* eslint-env browser */
+/* eslint-disable no-var */
 
 /**
  * <p>SWUtils can be used in a <strong>webpage only</strong>.</p>
