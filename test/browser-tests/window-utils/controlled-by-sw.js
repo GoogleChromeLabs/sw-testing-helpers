@@ -26,34 +26,47 @@
 describe('Test swUtils.controlledBySW()', function() {
   const SERVICE_WORKER_PATH = '/test/browser-tests/window-utils/serviceworkers';
 
-  it('should reject when called with no arguments', function(done) {
+  beforeEach(function() {
+    return window.goog.swUtils.cleanState();
+  });
+
+  after(function() {
+    return window.goog.swUtils.cleanState();
+  });
+
+  it('should reject when called with no arguments', function() {
     return window.goog.swUtils.controlledBySW()
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {});
   });
 
-  it('should reject when called with an array argument', function(done) {
+  it('should reject when called with an array argument', function() {
     return window.goog.swUtils.controlledBySW([])
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {});
   });
 
-  it('should reject called with an object argument', function(done) {
+  it('should reject called with an object argument', function() {
     return window.goog.swUtils.controlledBySW({})
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {});
   });
 
-  it('should reject when used with an invalid service worker path', function(done) {
+  it('should reject when used with an invalid service worker path', function() {
     return window.goog.swUtils.controlledBySW(SERVICE_WORKER_PATH + '/sw-doesnt-exist.js')
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {});
   });
 
-  it('should reject when used with a service worker that fails to install', function(done) {
+  it('should reject when used with a service worker that fails to install', function() {
     return window.goog.swUtils.controlledBySW(SERVICE_WORKER_PATH + '/sw-broken-install.js')
-    .then(() => done(new Error('Should have rejected')))
-    .catch(() => done());
+    .then(() => {
+      throw new Error('Should have rejected');
+    }, () => {});
   });
 
   it('should resolve once the service worker controls the iframe', function() {

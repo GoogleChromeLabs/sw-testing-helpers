@@ -224,16 +224,19 @@ class SWUtils {
    * worker has taken control.
    */
   controlledBySW(swUrl) {
-    return this.activateSW(swUrl).then(iframe => new Promise(resolve => {
-      let iframeSW = iframe.contentWindow.navigator.serviceWorker;
-      if (iframeSW.controller) {
-        resolve(iframe);
-      } else {
-        iframeSW.addEventListener('controllerchange',
-          () => resolve(iframe),
-          {once: true});
-      }
-    }));
+    return this.activateSW(swUrl)
+    .then(iframe => {
+      return new Promise(resolve => {
+        let iframeSW = iframe.contentWindow.navigator.serviceWorker;
+        if (iframeSW.controller) {
+          resolve(iframe);
+        } else {
+          iframeSW.addEventListener('controllerchange',
+            () => resolve(iframe),
+            {once: true});
+        }
+      });
+    });
   }
 
   /**

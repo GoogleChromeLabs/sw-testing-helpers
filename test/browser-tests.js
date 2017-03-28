@@ -93,9 +93,9 @@ describe('Perform Browser Tests', function() {
 
   seleniumAssistant.printAvailableBrowserInfo();
 
-  const automatedBrowsers = seleniumAssistant.getAvailableBrowsers();
+  const automatedBrowsers = seleniumAssistant.getLocalBrowsers();
   automatedBrowsers.forEach(browserInfo => {
-    switch (browserInfo.getSeleniumBrowserId()) {
+    switch (browserInfo.getId()) {
       case 'firefox':
         if (browserInfo.getVersionNumber() <= 50) {
           console.warn('Skipping FF version 50 or less due to travis issues.');
